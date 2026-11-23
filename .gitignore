@@ -1,0 +1,4 @@
+tests/screenshots/
+tests/.downloads/
+tests/last-run.txt
+node_modules/

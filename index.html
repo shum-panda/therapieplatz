@@ -1,0 +1,1605 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#F6EFE4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1E1A17" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Therapieplatz">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="Deine Therapieplatzsuche in Berlin, Schritt für Schritt. Alle Daten bleiben auf deinem Gerät.">
+<title>Therapieplatz</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* Ruhig und warm: Papierton, Ton-Rot als Akzent, Salbei für Erledigtes */
+:root {
+  --bg: #F6EFE4;
+  --bg-deep: #EFE4D4;
+  --surface: #FFFBF5;
+  --ink: #2E2723;
+  --muted: #74675C;
+  --line: #E6D9C6;
+  --accent: #A65A3C;
+  --accent-ink: #FFF8F1;
+  --accent-soft: #F5E2D6;
+  --sage: #5E7A5B;
+  --sage-soft: #E2EADB;
+  --sky: #4F6F93;
+  --sky-soft: #E1E9F1;
+  --honey: #946A12;
+  --honey-soft: #F7EACB;
+  --plum: #7A5A86;
+  --plum-soft: #EDE3F0;
+  --rose: #9C5560;
+  --rose-soft: #F4E1E2;
+  --sand: #8A7B6C;
+  --sand-soft: #EEE6DA;
+  --shadow: 0 1px 2px rgba(80,55,30,.06), 0 6px 20px rgba(80,55,30,.07);
+  --r: 18px;
+  --f-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --f-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1E1A17; --bg-deep: #26211D; --surface: #2A2420; --ink: #F1E8DE; --muted: #B5A797; --line: #3D352F;
+    --accent: #E39A78; --accent-ink: #2A1A12; --accent-soft: #43291F;
+    --sage: #A8C3A1; --sage-soft: #263124; --sky: #A3BEDC; --sky-soft: #1F2A36;
+    --honey: #E6C273; --honey-soft: #3A2F17; --plum: #CDB0D8; --plum-soft: #33283A;
+    --rose: #E3A3AC; --rose-soft: #3D2629; --sand: #C2B3A2; --sand-soft: #332C26;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1E1A17; --bg-deep: #26211D; --surface: #2A2420; --ink: #F1E8DE; --muted: #B5A797; --line: #3D352F;
+  --accent: #E39A78; --accent-ink: #2A1A12; --accent-soft: #43291F;
+  --sage: #A8C3A1; --sage-soft: #263124; --sky: #A3BEDC; --sky-soft: #1F2A36;
+  --honey: #E6C273; --honey-soft: #3A2F17; --plum: #CDB0D8; --plum-soft: #33283A;
+  --rose: #E3A3AC; --rose-soft: #3D2629; --sand: #C2B3A2; --sand-soft: #332C26;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55;
+  -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; margin: 0; letter-spacing: -0.01em; text-wrap: balance; line-height: 1.2; }
+h1 { font-size: 28px; }
+h2 { font-size: 21px; }
+h3 { font-size: 17px; }
+p { margin: 0; }
+a { color: var(--accent); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.tiny { font-size: 12.5px; }
+.nowrap { white-space: nowrap; }
+.pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* ---------- Grundgerüst ---------- */
+.shell { max-width: 1120px; margin: 0 auto; padding: 0 16px calc(96px + env(safe-area-inset-bottom, 0px)); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0 10px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; min-width: 0; }
+.brand svg { flex: none; }
+.brand b { font-family: var(--f-display); font-weight: 600; font-size: 20px; letter-spacing: -0.01em; }
+.top-actions { display: flex; gap: 8px; align-items: center; }
+.chip-btn { text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px 5px 5px; cursor: pointer; max-width: 170px; }
+.chip-btn .av { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; }
+.chip-btn span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; font-size: 15px; }
+.icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; cursor: pointer; color: var(--ink); text-decoration: none; }
+
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(6, 1fr);
+  background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)); }
+.tabs a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 5px 0 3px; text-decoration: none; color: var(--muted); font-size: 11.5px; font-weight: 600; border-radius: 12px; position: relative; }
+.tabs a svg { width: 23px; height: 23px; }
+.tabs a.on { color: var(--accent); }
+.tabs a.on::before { content: ""; position: absolute; top: 1px; width: 40px; height: 30px; border-radius: 12px; background: var(--accent-soft); z-index: -1; }
+.tabs .badge { position: absolute; top: 0; right: calc(50% - 22px); min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); font-size: 11px; line-height: 17px; text-align: center; }
+
+@media (min-width: 900px) {
+  .shell { display: grid; grid-template-columns: 210px 1fr; gap: 0 36px; padding-bottom: 48px; }
+  .top { grid-column: 1 / -1; padding-top: 22px; }
+  .tabs { position: sticky; top: 16px; align-self: start; display: flex; flex-direction: column; gap: 4px; background: none; backdrop-filter: none; border: 0; padding: 8px 0; }
+  .tabs a { flex-direction: row; gap: 12px; font-size: 15.5px; padding: 10px 14px; color: var(--ink); }
+  .tabs a.on { background: var(--accent-soft); }
+  .tabs a.on::before { display: none; }
+  .tabs .badge { position: static; margin-left: auto; }
+  main { min-width: 0; }
+}
+
+/* ---------- Bausteine ---------- */
+.view { display: flex; flex-direction: column; gap: 18px; padding-top: 6px; }
+.head { display: flex; flex-direction: column; gap: 6px; }
+.head p { color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); }
+.card.flat { box-shadow: none; }
+.card.soft { background: var(--bg-deep); border-color: transparent; box-shadow: none; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.between { justify-content: space-between; }
+.grid2 { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+.sec-title { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.sec-title h2 { font-size: 19px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border-radius: 14px; border: 1px solid transparent;
+  background: var(--accent); color: var(--accent-ink); font-weight: 700; cursor: pointer; text-decoration: none; line-height: 1.2; text-align: center; }
+.btn:hover { filter: brightness(1.05); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.soft { background: var(--accent-soft); color: var(--accent); }
+.btn.sage { background: var(--sage); color: #fff; }
+.btn.small { min-height: 36px; padding: 6px 12px; font-size: 14.5px; border-radius: 11px; }
+.btn.danger { background: transparent; color: var(--rose); border-color: var(--rose-soft); }
+.btn.block { width: 100%; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.field > span { font-size: 14px; font-weight: 700; color: var(--muted); }
+.field small { color: var(--muted); font-size: 13px; }
+input[type=text], input[type=tel], input[type=email], input[type=url], input[type=date], input[type=time], input[type=number], input[type=search], select, textarea {
+  width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
+input:focus, select:focus, textarea:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); border-color: var(--accent); }
+.check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); flex: none; }
+
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; background: var(--sand-soft); color: var(--sand); }
+.st-neu { background: var(--sand-soft); color: var(--sand); }
+.st-angefragt { background: var(--sky-soft); color: var(--sky); }
+.st-rueckruf { background: var(--honey-soft); color: var(--honey); }
+.st-warteliste { background: var(--plum-soft); color: var(--plum); }
+.st-absage { background: var(--rose-soft); color: var(--rose); }
+.st-erstgespraech { background: var(--sage-soft); color: var(--sage); }
+.st-platz { background: var(--sage); color: #fff; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 7px; font-size: 12.5px; font-weight: 700; background: var(--bg-deep); color: var(--muted); }
+.tag.tp { background: var(--accent-soft); color: var(--accent); }
+
+.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; margin: 0 -16px; padding-inline: 16px; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 14px; font-weight: 700; font-size: 14px; cursor: pointer; color: var(--ink); }
+.chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip .n { opacity: .6; margin-left: 4px; font-weight: 600; }
+
+.empty { text-align: center; padding: 28px 18px; color: var(--muted); }
+.empty h3 { color: var(--ink); margin-bottom: 6px; }
+
+/* Start */
+.hello h1 { font-size: 30px; }
+.hello p { color: var(--muted); max-width: 52ch; margin-top: 6px; }
+.next { background: linear-gradient(135deg, var(--accent-soft), color-mix(in srgb, var(--honey-soft) 70%, var(--accent-soft))); border: 0; }
+.next .label { font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.next h2 { margin: 4px 0 6px; }
+.next ul { margin: 8px 0 0; padding-left: 18px; }
+.next li + li { margin-top: 4px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 6px; text-align: center; }
+.stat b { display: block; font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1.1; }
+.stat span { font-size: 12.5px; color: var(--muted); font-weight: 700; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.step { display: grid; grid-template-columns: 34px 1fr; gap: 0 14px; position: relative; padding-bottom: 14px; }
+.step:not(:last-child)::before { content: ""; position: absolute; left: 16px; top: 34px; bottom: 0; width: 2px; background: var(--line); }
+.step .dot { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--surface); border: 2px solid var(--line); color: var(--muted); z-index: 1; font-size: 15px; }
+.step.done .dot { background: var(--sage); border-color: var(--sage); color: #fff; }
+.step.now .dot { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 6px var(--accent-soft); }
+.step details { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+.step.now details { border-color: var(--accent); box-shadow: var(--shadow); }
+.step summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.step summary::-webkit-details-marker { display: none; }
+.step summary h3 { font-size: 16.5px; }
+.step summary .hint { font-size: 12.5px; font-weight: 800; color: var(--accent); white-space: nowrap; }
+.step.done summary .hint { color: var(--sage); }
+.step .body { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; font-size: 15.5px; }
+.links { display: flex; flex-direction: column; gap: 8px; }
+.links a { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); text-decoration: none; color: var(--ink); font-weight: 700; }
+.links a small { display: block; font-weight: 400; color: var(--muted); }
+.note { font-size: 14px; color: var(--muted); border-left: 3px solid var(--line); padding-left: 12px; }
+
+/* Liste */
+.tlist { display: flex; flex-direction: column; gap: 10px; }
+.tcard { display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; cursor: pointer; text-align: left; width: 100%; color: inherit; }
+.tcard:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.tcard .name { overflow-wrap: anywhere; font-weight: 800; font-size: 16.5px; line-height: 1.3; }
+.tcard .meta { font-size: 14px; color: var(--muted); }
+.tcard .tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.filters { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.filters select { min-height: 40px; padding: 6px 8px; font-size: 14px; }
+.search { position: relative; }
+
+/* Detail */
+.dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 15px; }
+.dl dt { color: var(--muted); font-weight: 700; }
+.dl dd { margin: 0; overflow-wrap: anywhere; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 36px 1fr; gap: 10px; }
+.timeline .ic { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: var(--bg-deep); color: var(--muted); }
+.timeline .ic.in { background: var(--sky-soft); color: var(--sky); }
+.timeline .when { font-size: 13px; color: var(--muted); }
+.timeline .txt { margin-top: 4px; font-size: 14.5px; background: var(--bg-deep); border-radius: 12px; padding: 8px 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.statusbar { display: flex; flex-wrap: wrap; gap: 6px; }
+.statusbar button { border: 1px solid var(--line); background: var(--surface); padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 13.5px; cursor: pointer; color: var(--ink); }
+.statusbar button.on { border-color: transparent; }
+
+/* Anrufen */
+.callrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 14px 16px; }
+.callrow + .callrow { border-top: 1px solid var(--line); }
+.callrow .who { font-weight: 800; overflow-wrap: anywhere; }
+.callrow .when { font-size: 14px; color: var(--muted); }
+.callrow .count { font-weight: 800; color: var(--sage); }
+.callrow .count.later { color: var(--honey); }
+.calllist { padding: 0; overflow: hidden; }
+.btn.call { background: var(--sage); color: #fff; border-radius: 999px; min-width: 112px; }
+.live { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--sage); margin-right: 6px; box-shadow: 0 0 0 4px var(--sage-soft); animation: pulse 2s infinite; vertical-align: 1px; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 7px transparent; } }
+@media (prefers-reduced-motion: reduce) { .live { animation: none; } }
+.plan { list-style: none; margin: 0; padding: 0; }
+.plan li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+.plan li:last-child { border-bottom: 0; }
+.plan .t { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 14.5px; }
+.plan li.past { opacity: .45; }
+.plan li.now .t { color: var(--sage); }
+
+/* Mails */
+.seg { display: flex; background: var(--bg-deep); padding: 4px; border-radius: 14px; gap: 4px; }
+.seg button { flex: 1; border: 0; background: none; padding: 9px 6px; border-radius: 11px; font-weight: 700; cursor: pointer; color: var(--muted); font-size: 14.5px; }
+.seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.pick { display: flex; flex-direction: column; }
+.pick label { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; align-items: center; padding: 11px 2px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.pick label:last-child { border-bottom: 0; }
+.pick input { width: 20px; height: 20px; accent-color: var(--accent); margin: 0; }
+.preview { background: var(--bg-deep); border-radius: 14px; padding: 12px 14px; font-size: 14.5px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 320px; overflow: auto; }
+[data-queue] .preview { max-height: 230px; }
+.progress { height: 8px; background: var(--bg-deep); border-radius: 4px; overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .3s; }
+.ph { display: flex; flex-wrap: wrap; gap: 6px; }
+.ph button { border: 1px dashed var(--line); background: var(--surface); border-radius: 8px; padding: 3px 8px; font-size: 13px; cursor: pointer; color: var(--ink); font-family: ui-monospace, Consolas, monospace; }
+
+/* Protokoll */
+.ptable { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.ptable th { text-align: left; font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.ptable td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ptable tr[data-act] { cursor: pointer; }
+.ptable tr[data-act]:hover td { background: var(--bg-deep); }
+@media (max-width: 699px) {
+  .ptable thead { display: none; }
+  .ptable, .ptable tbody, .ptable tr, .ptable td { display: block; }
+  .ptable tr { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 12px 2px; border-bottom: 1px solid var(--line); }
+  .ptable td { border: 0; padding: 0; }
+  .ptable td.c-date { grid-column: 1; font-size: 13px; color: var(--muted); order: 1; }
+  .ptable td.c-kanal { grid-column: 2; font-size: 13px; color: var(--muted); order: 2; text-align: right; }
+  .ptable td.c-name { grid-column: 1 / -1; font-weight: 800; order: 3; }
+  .ptable td.c-res { grid-column: 1 / -1; order: 4; }
+  .ptable td.c-wait { grid-column: 1 / -1; order: 5; font-size: 13.5px; color: var(--muted); }
+  .ptable td.c-wait:empty { display: none; }
+}
+
+/* Antrag */
+.checklist { display: flex; flex-direction: column; gap: 12px; }
+.checklist .check small { display: block; color: var(--muted); font-size: 13.5px; }
+.letter { font-family: Georgia, "Times New Roman", serif; font-size: 15px; min-height: 420px; line-height: 1.55; }
+.deadline { display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--honey-soft); color: var(--honey); font-weight: 700; font-size: 14.5px; }
+
+/* Sheet */
+.scrim { position: fixed; inset: 0; background: rgba(40,28,20,.38); z-index: 40; display: flex; align-items: flex-end; justify-content: center; animation: fade .18s ease; }
+.sheet { width: 100%; max-width: 620px; max-height: 92vh; max-height: 92dvh; overflow: auto; background: var(--surface); border-radius: 24px 24px 0 0; padding: 10px 18px calc(22px + env(safe-area-inset-bottom, 0px)); animation: up .22s ease; overscroll-behavior: contain; }
+.sheet .grab { width: 44px; height: 5px; border-radius: 3px; background: var(--line); margin: 2px auto 12px; }
+.sheet h2 { margin-bottom: 4px; }
+.sheet .acts { position: sticky; bottom: calc(-22px - env(safe-area-inset-bottom, 0px)); background: var(--surface); padding: 12px 0 0; margin-top: 6px; display: flex; gap: 10px; }
+.sheet .acts .btn { flex: 1; }
+@media (min-width: 700px) { .scrim { align-items: center; } .sheet { border-radius: 24px; padding-bottom: 22px; } .sheet .acts { bottom: -22px; } }
+@keyframes up { from { transform: translateY(30px); opacity: 0; } }
+@keyframes fade { from { opacity: 0; } }
+.outcomes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.outcomes button { min-height: 54px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); font-weight: 700; cursor: pointer; padding: 8px; color: var(--ink); line-height: 1.25; }
+.outcomes button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.zeiten { display: flex; flex-direction: column; gap: 8px; }
+.zrow { display: grid; grid-template-columns: 76px 1fr 1fr 40px; gap: 6px; align-items: center; }
+.zrow select, .zrow input { min-height: 42px; padding: 6px 8px; }
+.zrow button { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; color: var(--muted); }
+
+.toast { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: 14px; font-weight: 600; font-size: 15px; max-width: min(92vw, 460px); box-shadow: var(--shadow); animation: up .2s ease; }
+@media (min-width: 900px) { .toast { bottom: 28px; } }
+
+.welcome { max-width: 520px; margin: 6vh auto 0; display: flex; flex-direction: column; gap: 18px; }
+.welcome h1 { font-size: 34px; }
+
+/* ---------- Druck ---------- */
+#print { display: none; }
+@media print {
+  @page { margin: 18mm 16mm; }
+  body { background: #fff; color: #000; padding: 0; }
+  body > *:not(#print) { display: none !important; }
+  #print { display: block; font-family: Georgia, "Times New Roman", serif; font-size: 11pt; line-height: 1.45; color: #000; }
+  #print h1 { font-family: Georgia, serif; font-size: 16pt; margin: 0 0 4pt; }
+  #print .meta { margin-bottom: 12pt; font-size: 10pt; }
+  #print table { width: 100%; border-collapse: collapse; font-size: 9.5pt; font-family: Arial, Helvetica, sans-serif; }
+  #print th, #print td { border: 0.6pt solid #888; padding: 4pt 5pt; text-align: left; vertical-align: top; }
+  #print th { background: #eee; }
+  #print tr { break-inside: avoid; }
+  #print .sum { margin: 10pt 0; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; }
+  #print .letter-print { white-space: pre-wrap; font-size: 11pt; }
+  #print .foot { margin-top: 16pt; font-size: 9pt; color: #444; }
+}
+</style>
+</head>
+<body>
+<div class="shell" id="app"></div>
+<div id="print" aria-hidden="true"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   Therapieplatz: alles bleibt im Browser (localStorage). Kein Server.
+   ===================================================================== */
+
+// ---------- Hilfsfunktionen ----------
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = (s) => String(s ?? "").replace(/[&<>"'`]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#96;" }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const pad = (n) => String(n).padStart(2, "0");
+const TAGE = ["", "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+const TAGE_LANG = ["", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+const wd = (d) => ((d.getDay() + 6) % 7) + 1; // 1 = Montag
+const toMin = (hhmm) => { const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm || ""); return m ? +m[1] * 60 + +m[2] : null; };
+const fromMin = (m) => pad(Math.floor(m / 60)) + ":" + pad(m % 60);
+const nowMin = (d = new Date()) => d.getHours() * 60 + d.getMinutes();
+const isoDate = (d = new Date()) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const fmtDate = (iso) => { if (!iso) return ""; const d = new Date(iso.length <= 10 ? iso + "T12:00" : iso); return isNaN(d) ? "" : pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear(); };
+const fmtTime = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : pad(d.getHours()) + ":" + pad(d.getMinutes()); };
+const fmtDur = (min) => min < 60 ? min + " Min" : Math.floor(min / 60) + " Std" + (min % 60 ? " " + (min % 60) + " Min" : "");
+const addDays = (iso, n) => { const d = new Date(iso + "T12:00"); d.setDate(d.getDate() + n); return isoDate(d); };
+const addMonths = (iso, n) => { const d = new Date(iso + "T12:00"); d.setMonth(d.getMonth() + n); return isoDate(d); };
+const daysBetween = (a, b) => Math.round((new Date(b + "T12:00") - new Date(a + "T12:00")) / 86400000);
+const telHref = (t) => "tel:" + String(t || "").replace(/[^\d+]/g, "");
+const safeUrl = (u) => { u = String(u || "").trim(); if (!u) return ""; if (/^www\./i.test(u)) u = "https://" + u; return /^https?:\/\//i.test(u) ? u : ""; };
+const plural = (n, one, many) => n + " " + (n === 1 ? one : many);
+
+const ICON = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/></svg>',
+  list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M3 18.5c.8-2.6 2.8-4 5-4s4.2 1.4 5 4M15 7h6M15 11h6M16 15h5"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6.6 3.5h2.6l1.4 4.1-2 1.4a12 12 0 0 0 6.4 6.4l1.4-2 4.1 1.4v2.6a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m4.5 7 7.5 6 7.5-6"/></svg>',
+  log: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V5"/><path d="M9.5 11h5M9.5 14.5h5M9.5 18h3"/></svg>',
+  doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20.5V5a1.5 1.5 0 0 1 1.5-1.5H15l4 4v13"/><path d="m9 13 2 2 4-4.5"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg>',
+  out: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+  note: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 19h4L19.5 8.5a2.1 2.1 0 0 0-3-3L6 16z"/></svg>',
+  inbox: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 13.5 6.5 5h11l2.5 8.5V19H4z"/><path d="M4 13.5h5l1 2h4l1-2h5"/></svg>',
+};
+const LOGO = '<svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="18" fill="#F1E2CD"/><circle cx="32" cy="31" r="14" fill="#C8714E"/><path d="M0 44c10-7 20-9 32-6s22 2 32-4v30H0z" fill="#86A07F"/><path d="M0 52c12-5 24-5 36-2s20 2 28-1v15H0z" fill="#5F7C5E"/></svg>';
+
+// ---------- Fachliche Konstanten ----------
+const STATUS = {
+  neu: "Neu", angefragt: "Angefragt", rueckruf: "Rückruf erwartet", warteliste: "Warteliste",
+  absage: "Absage", erstgespraech: "Erstgespräch vereinbart", platz: "Platz",
+};
+const STATUS_ORDER = ["neu", "angefragt", "rueckruf", "warteliste", "erstgespraech", "platz", "absage"];
+const VERFAHREN = { TP: "Tiefenpsychologisch fundiert", VT: "Verhaltenstherapie", AP: "Analytisch", ST: "Systemisch" };
+const VERFAHREN_LANG = { TP: "tiefenpsychologisch fundierte Psychotherapie", VT: "Verhaltenstherapie", AP: "analytische Psychotherapie", ST: "systemische Therapie" };
+const TYP = { kasse: "Kassensitz", privat: "Privatpraxis", "": "Unklar" };
+const BEZIRKE = ["Charlottenburg-Wilmersdorf", "Friedrichshain-Kreuzberg", "Lichtenberg", "Marzahn-Hellersdorf", "Mitte", "Neukölln", "Pankow", "Reinickendorf", "Spandau", "Steglitz-Zehlendorf", "Tempelhof-Schöneberg", "Treptow-Köpenick"];
+const ORTSTEILE = {
+  "Charlottenburg-Wilmersdorf": ["Charlottenburg", "Wilmersdorf", "Westend", "Grunewald", "Halensee", "Schmargendorf"],
+  "Friedrichshain-Kreuzberg": ["Friedrichshain", "Kreuzberg"],
+  "Lichtenberg": ["Lichtenberg", "Friedrichsfelde", "Karlshorst", "Hohenschönhausen", "Rummelsburg", "Fennpfuhl"],
+  "Marzahn-Hellersdorf": ["Marzahn", "Hellersdorf", "Biesdorf", "Kaulsdorf", "Mahlsdorf"],
+  "Mitte": ["Mitte", "Moabit", "Wedding", "Gesundbrunnen", "Tiergarten", "Hansaviertel"],
+  "Neukölln": ["Neukölln", "Britz", "Buckow", "Rudow", "Gropiusstadt"],
+  "Pankow": ["Pankow", "Prenzlauer Berg", "Weißensee", "Niederschönhausen", "Heinersdorf", "Französisch Buchholz"],
+  "Reinickendorf": ["Reinickendorf", "Tegel", "Wittenau", "Hermsdorf", "Frohnau", "Waidmannslust"],
+  "Spandau": ["Spandau", "Staaken", "Siemensstadt", "Haselhorst"],
+  "Steglitz-Zehlendorf": ["Steglitz", "Zehlendorf", "Dahlem", "Lichterfelde", "Lankwitz", "Wannsee", "Nikolassee"],
+  "Tempelhof-Schöneberg": ["Tempelhof", "Schöneberg", "Friedenau", "Mariendorf", "Marienfelde", "Lichtenrade"],
+  "Treptow-Köpenick": ["Treptow", "Köpenick", "Adlershof", "Baumschulenweg", "Johannisthal", "Friedrichshagen", "Oberschöneweide", "Niederschöneweide", "Plänterwald"],
+};
+// Ergebnisse eines Kontakts. status: "touch" hebt nur "Neu" auf "Angefragt"
+const RES = {
+  gesendet: { label: "E-Mail gesendet", status: "touch" },
+  nicht_erreicht: { label: "Nicht erreicht", status: "touch" },
+  ab: { label: "Anrufbeantworter", status: "touch" },
+  besetzt: { label: "Besetzt", status: "touch" },
+  antwort: { label: "Antwort / Info", status: "touch", reply: true },
+  rueckruf: { label: "Rückruf vereinbart", status: "rueckruf", reply: true },
+  warteliste: { label: "Warteliste", status: "warteliste", reply: true },
+  absage: { label: "Absage", status: "absage", reply: true },
+  termin: { label: "Termin / Erstgespräch", status: "erstgespraech", reply: true },
+  platz: { label: "Platz zugesagt", status: "platz", reply: true },
+  notiz: { label: "Notiz", status: null },
+};
+const CALL_RES = ["nicht_erreicht", "ab", "besetzt", "absage", "warteliste", "rueckruf", "termin"];
+const KANAL = { telefon: "Telefon", email: "E-Mail", brief: "Brief/Post", persoenlich: "Persönlich", sonstig: "Sonstiges" };
+const FOLLOW_DAYS = 7;
+
+const DEFAULT_TEMPLATES = () => [
+  { id: "t-erst", name: "Erstanfrage Kassenplatz", subject: "Anfrage Therapieplatz ({verfahren})",
+    body: "{anrede},\n\nich suche einen Platz für eine {verfahren} und möchte fragen, ob Sie in absehbarer Zeit einen Therapieplatz frei haben oder mich auf Ihre Warteliste setzen können.\n\nIch bin bei der {kasse} versichert. {ptv11}\n{dringlichkeit}\n\nZu meiner zeitlichen Verfügbarkeit: {verfuegbarkeit}\n\nSie erreichen mich per E-Mail oder telefonisch unter {meineTelefon}.\n\nVielen Dank und freundliche Grüße\n{meinName}" },
+  { id: "t-privat", name: "Anfrage Privatpraxis (Kostenerstattung)", subject: "Anfrage Therapieplatz über Kostenerstattung",
+    body: "{anrede},\n\nich suche einen Platz für eine {verfahren}. Bei Praxen mit Kassensitz habe ich trotz vieler Anfragen bisher keinen Platz in absehbarer Zeit gefunden. Deshalb möchte ich bei meiner Krankenkasse ({kasse}) eine Kostenerstattung beantragen.\n\nHätten Sie einen Platz frei und wären Sie bereit, mich im Rahmen der Kostenerstattung zu behandeln? {ptv11}\n{dringlichkeit}\n\nZu meiner zeitlichen Verfügbarkeit: {verfuegbarkeit}\n\nTelefonisch erreichen Sie mich unter {meineTelefon}.\n\nVielen Dank und freundliche Grüße\n{meinName}" },
+  { id: "t-nach", name: "Nachfassen", subject: "Nachfrage: Anfrage Therapieplatz",
+    body: "{anrede},\n\nvor einiger Zeit habe ich Ihnen wegen eines Therapieplatzes ({verfahren}) geschrieben. Ich wollte freundlich nachfragen, ob sich bei Ihnen inzwischen etwas ergeben hat oder ob eine Aufnahme auf Ihre Warteliste möglich ist.\n\nIch bin weiterhin bei der {kasse} versichert und zeitlich {verfuegbarkeit}.\n\nVielen Dank und freundliche Grüße\n{meinName}" },
+];
+
+function blankData(name) {
+  return {
+    v: 1,
+    ich: { name, vollname: "", geburt: "", adresse: "", telefon: "", email: "", kasse: "", kasseAdresse: "", versNr: "",
+      verfahren: "TP", verfuegbarkeit: "", dringlichkeit: "", sprechstundeDatum: "", sprechstundeBei: "",
+      ptv11: false, ptv11Datum: "", zeitnah: false, tss: false, weg: "" },
+    therapists: [], log: [], templates: DEFAULT_TEMPLATES(),
+    antrag: { check: {}, privatTid: "", gestelltAm: "", frist: "", antwort: "", antwortAm: "", widerspruchAm: "", notiz: "", brief: "", widerspruch: "" },
+    queue: null, followDone: {},
+  };
+}
+
+// ---------- Speicher ----------
+const LS = "tp1";
+let D = null;
+function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { toast("Speichern hat nicht geklappt. Ist der Speicher voll oder privat?"); return false; } }
+function normalize(d) {
+  d = d && typeof d === "object" ? d : {};
+  const out = Object.assign(blankData(""), d);
+  out.ich = Object.assign(blankData("").ich, d.ich || {});
+  out.antrag = Object.assign(blankData("").antrag, d.antrag || {});
+  out.antrag.check = Object.assign({}, (d.antrag || {}).check || {});
+  out.therapists = Array.isArray(d.therapists) ? d.therapists.filter((t) => t && t.id).map(normT) : [];
+  out.log = Array.isArray(d.log) ? d.log.filter((l) => l && l.id && l.ts) : [];
+  out.templates = Array.isArray(d.templates) && d.templates.length ? d.templates : DEFAULT_TEMPLATES();
+  out.followDone = d.followDone && typeof d.followDone === "object" ? d.followDone : {};
+  return out;
+}
+function normT(t) {
+  return Object.assign({ id: uid(), name: "", anrede: "", praxis: "", adresse: "", bezirk: "", verfahren: [], typ: "", telefon: "", zeiten: [], email: "", website: "", notizen: "", status: "neu", warteWochen: "", created: new Date().toISOString() }, t, {
+    verfahren: Array.isArray(t.verfahren) ? t.verfahren : [], zeiten: Array.isArray(t.zeiten) ? t.zeiten : [],
+  });
+}
+// Genau eine Person pro Gerät: alle Daten liegen unter einem Schlüssel
+const KEY = LS + ".daten";
+function loadAll() { const raw = lsGet(KEY); D = raw ? normalize(raw) : null; }
+function save() { if (D) lsSet(KEY, D); }
+function myName() { return (D && (D.ich.name || D.ich.vollname.split(" ")[0])) || ""; }
+
+// ---------- Abgeleitete Werte ----------
+const T = (id) => D.therapists.find((t) => t.id === id);
+const tName = (t) => t ? (t.name || t.praxis || "Ohne Namen") : "Gelöscht";
+const logsFor = (tid) => D.log.filter((l) => l.tid === tid).sort((a, b) => b.ts.localeCompare(a.ts));
+const activeT = (t) => !["absage", "platz"].includes(t.status);
+function stats() {
+  const ts = D.therapists;
+  return {
+    kontaktiert: ts.filter((t) => t.status !== "neu").length,
+    absagen: ts.filter((t) => t.status === "absage").length,
+    warte: ts.filter((t) => t.status === "warteliste").length,
+    versuche: D.log.filter((l) => l.ergebnis !== "notiz").length,
+    erst: ts.filter((t) => t.status === "erstgespraech").length,
+    platz: ts.filter((t) => t.status === "platz").length,
+  };
+}
+// Telefonfenster heute: [{t, von, bis, state, mins}]
+function windowsToday(d = new Date()) {
+  const day = wd(d), n = nowMin(d), out = [];
+  for (const t of D.therapists) {
+    if (!t.telefon || !activeT(t)) continue;
+    for (const z of t.zeiten) {
+      if (+z.tag !== day) continue;
+      const v = toMin(z.von), b = toMin(z.bis);
+      if (v == null || b == null || b <= v) continue;
+      out.push({ t, von: v, bis: b, state: n >= b ? "past" : n >= v ? "now" : "later", mins: n >= v ? b - n : v - n });
+    }
+  }
+  return out.sort((a, b) => a.von - b.von || tName(a.t).localeCompare(tName(b.t)));
+}
+function nextWindow(t, d = new Date()) {
+  const n = nowMin(d), day = wd(d);
+  for (let off = 0; off < 8; off++) {
+    const dd = ((day - 1 + off) % 7) + 1;
+    const ws = t.zeiten.filter((z) => +z.tag === dd).map((z) => ({ v: toMin(z.von), b: toMin(z.bis) })).filter((z) => z.v != null && z.b > z.v).sort((a, b) => a.v - b.v);
+    for (const w of ws) {
+      if (off === 0 && w.b <= n) continue;
+      return { off, tag: dd, von: w.v, bis: w.b, now: off === 0 && w.v <= n };
+    }
+  }
+  return null;
+}
+function nextWindowText(t) {
+  const w = nextWindow(t);
+  if (!w) return "";
+  if (w.now) return "Jetzt erreichbar, noch " + fmtDur(w.bis - nowMin());
+  const when = w.off === 0 ? "heute" : w.off === 1 ? "morgen" : TAGE[w.tag];
+  return "Telefonzeit " + when + " " + fromMin(w.von) + "–" + fromMin(w.bis);
+}
+// Nachfassen: letzte gesendete E-Mail ohne spätere Antwort
+function followUps() {
+  const out = [];
+  for (const t of D.therapists) {
+    if (!["neu", "angefragt"].includes(t.status)) continue;
+    const ls = logsFor(t.id);
+    const sent = ls.find((l) => l.ergebnis === "gesendet");
+    if (!sent) continue;
+    const answered = ls.some((l) => l.ts > sent.ts && RES[l.ergebnis]?.reply);
+    if (answered || D.followDone[sent.id]) continue;
+    const age = daysBetween(sent.ts.slice(0, 10), isoDate());
+    out.push({ t, sent, age, due: age >= FOLLOW_DAYS, dueDate: addDays(sent.ts.slice(0, 10), FOLLOW_DAYS) });
+  }
+  return out.sort((a, b) => b.age - a.age);
+}
+function currentStep() {
+  const i = D.ich;
+  if (D.therapists.some((t) => t.status === "platz" || t.status === "erstgespraech")) return 4;
+  if (i.weg === "kostenerstattung" || D.antrag.gestelltAm) return 5;
+  if (!i.sprechstundeDatum && !i.ptv11) return 1;
+  if (!i.ptv11) return 2;
+  return 3;
+}
+
+// ---------- Logbuch ----------
+function addLog(entry, opts = {}) {
+  const t = T(entry.tid);
+  const l = Object.assign({ id: "l" + uid(), ts: new Date().toISOString(), kanal: "telefon", ergebnis: "notiz", wochen: "", text: "", tname: tName(t) }, entry);
+  D.log.push(l);
+  if (t && opts.applyStatus !== false) applyResult(t, l);
+  save();
+  return l;
+}
+function applyResult(t, l) {
+  const r = RES[l.ergebnis];
+  if (!r || !r.status) return;
+  if (r.status === "touch") { if (t.status === "neu") t.status = "angefragt"; return; }
+  t.status = r.status;
+  if (r.status === "warteliste" && l.wochen) t.warteWochen = l.wochen;
+}
+
+// ---------- Vorlagen ----------
+function anrede(t) {
+  if (!t || (!t.name && !t.praxis)) return "Sehr geehrte Damen und Herren";
+  const clean = cleanName(t.name || "");
+  if (!clean) return "Sehr geehrte Damen und Herren";
+  const parts = clean.split(/\s+/);
+  const titel = parts.filter((p) => /^(Dr\.|Prof\.)$/i.test(p)).join(" ");
+  const last = parts.filter((p) => !/^(Dr\.|Prof\.|med\.|phil\.|rer\.|nat\.)$/i.test(p)).pop() || clean;
+  const tt = titel ? titel + " " : "";
+  if (t.anrede === "frau") return "Sehr geehrte Frau " + tt + last;
+  if (t.anrede === "herr") return "Sehr geehrter Herr " + tt + last;
+  return "Guten Tag " + clean;
+}
+function placeholders(t) {
+  const i = D.ich;
+  const vf = (t && t.verfahren.includes(i.verfahren)) || !t || !t.verfahren.length ? i.verfahren : (t.verfahren.includes("TP") ? "TP" : t.verfahren[0]);
+  return {
+    anrede: anrede(t),
+    therapeut: t ? tName(t) : "",
+    verfahren: VERFAHREN_LANG[vf] || VERFAHREN_LANG.TP,
+    kasse: i.kasse,
+    verfuegbarkeit: i.verfuegbarkeit,
+    ptv11: i.ptv11 ? "Eine psychotherapeutische Sprechstunde hatte ich bereits, das Formular PTV 11 liegt mir vor." + (i.zeitnah ? " Darauf ist vermerkt, dass eine Behandlung zeitnah erforderlich ist." : "") : "",
+    dringlichkeit: i.dringlichkeit,
+    meinName: i.vollname || i.name,
+    meineTelefon: i.telefon,
+    meineEmail: i.email,
+  };
+}
+const PH_LIST = [["anrede", "Anrede"], ["therapeut", "Name Praxis"], ["verfahren", "Verfahren"], ["kasse", "Krankenkasse"], ["verfuegbarkeit", "Verfügbarkeit"], ["ptv11", "PTV 11 vorhanden"], ["dringlichkeit", "Dringlichkeit"], ["meinName", "Dein Name"], ["meineTelefon", "Deine Nummer"]];
+// Zeilen, deren Platzhalter leer bleiben, fallen weg
+function fill(text, t) {
+  const ph = placeholders(t);
+  return String(text || "").split("\n").map((line) => {
+    let empty = false;
+    const out = line.replace(/\{(\w+)\}/g, (m, k) => {
+      if (!(k in ph)) return m;
+      const v = String(ph[k] || "").trim();
+      if (!v) empty = true;
+      return v;
+    });
+    return empty && !out.replace(/[\s,.:;]/g, "").length ? null : empty && /:\s*$/.test(out.trim()) ? null : out.replace(/ {2,}/g, " ").replace(/\s+$/, "");
+  }).filter((l) => l !== null).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+function mailtoFor(t, tpl) {
+  return "mailto:" + encodeURIComponent(t.email.trim()).replace(/%40/g, "@") + "?subject=" + encodeURIComponent(fill(tpl.subject, t)) + "&body=" + encodeURIComponent(fill(tpl.body, t));
+}
+
+// ---------- Aus Text erkennen ----------
+function cleanName(s) {
+  return String(s || "")
+    .replace(/(?<![\p{L}])(Dipl\.?\s*-?\s*Psych(?:ol)?\.?(?:\s*\(FH\))?|M\.\s?Sc\.?|B\.\s?Sc\.?|MSc|BSc|M\.\s?A\.|Dipl\.?\s*-?\s*(?:Päd|Soz\.?\s*Päd)\.?)(?![\p{L}])/giu, "")
+    .replace(/,.*$/, "")
+    .replace(/\b(Psychologische[rn]?|Ärztliche[rn]?)\s+Psychotherapeut(?:in|en)?\b/gi, "")
+    .replace(/\s{2,}/g, " ").replace(/^[\s,–-]+|[\s,–-]+$/g, "").trim();
+}
+function parseZeiten(text) {
+  const norm = String(text)
+    .replace(/Montags?/gi, "Mo").replace(/Dienstags?/gi, "Di").replace(/Mittwochs?/gi, "Mi").replace(/Donnerstags?/gi, "Do")
+    .replace(/Freitags?/gi, "Fr").replace(/Samstags?|Sonnabends?/gi, "Sa").replace(/Sonntags?/gi, "So");
+  const out = [];
+  const D7 = { mo: 1, di: 2, mi: 3, do: 4, fr: 5, sa: 6, so: 7 };
+  for (const line of norm.split(/\n/)) {
+    if (/fax/i.test(line)) continue;
+    const re = /(?<![A-Za-zÄÖÜäöüß])(Mo|Di|Mi|Do|Fr|Sa|So)\.?(?:\s*(?:-|–|—|bis)\s*(Mo|Di|Mi|Do|Fr|Sa|So)\.?)?(?![A-Za-zÄÖÜäöüß])|(?<!\d)(\d{1,2})(?:[:.](\d{2}))?\s*(?:Uhr)?\s*(?:-|–|—|bis)\s*(\d{1,2})(?:[:.](\d{2}))?(?!\d)/g;
+    let days = [], used = false, m;
+    while ((m = re.exec(line))) {
+      if (m[1]) {
+        if (used) { days = []; used = false; }
+        const a = D7[m[1].toLowerCase()], b = m[2] ? D7[m[2].toLowerCase()] : a;
+        for (let d = a; d <= (b >= a ? b : a); d++) if (!days.includes(d)) days.push(d);
+      } else if (days.length) {
+        const v = +m[3] * 60 + +(m[4] || 0), b = +m[5] * 60 + +(m[6] || 0);
+        if (v >= 360 && b <= 1320 && b > v) {
+          for (const d of days) if (!out.some((z) => z.tag === d && z.von === fromMin(v))) out.push({ tag: d, von: fromMin(v), bis: fromMin(b) });
+          used = true;
+        }
+      }
+    }
+  }
+  return out.sort((a, b) => a.tag - b.tag || a.von.localeCompare(b.von));
+}
+function parseText(raw) {
+  const text = String(raw || "").replace(/\r/g, "").replace(/ /g, " ");
+  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  const r = { name: "", anrede: "", praxis: "", adresse: "", bezirk: "", verfahren: [], typ: "", telefon: "", email: "", website: "", zeiten: [], notizen: "" };
+  const email = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  if (email) r.email = email[0];
+  const web = text.match(/\b(?:https?:\/\/|www\.)[^\s<>"',;]+/i);
+  if (web) r.website = web[0].replace(/[).]+$/, "");
+  const phoneRe = /(?:\+49[\s\-\/]?|0)(?:\(0\)\s?)?\d{2,5}\)?\s?[\-\/]?\s?\(?\d[\d \-\/]{3,}\d/;
+  const telLine = lines.find((l) => /tel|fon|☎/i.test(l) && !/fax/i.test(l) && phoneRe.test(l)) || lines.find((l) => !/fax/i.test(l) && phoneRe.test(l) && !/@/.test(l));
+  if (telLine) r.telefon = telLine.match(phoneRe)[0].replace(/\s{2,}/g, " ").trim();
+  // Adresse: Zeile mit PLZ (Berlin 10xxx–14xxx), Straße davor oder in derselben Zeile
+  const plzIdx = lines.findIndex((l) => /\b1[0-4]\d{3}\s+Berlin\b/i.test(l));
+  const streetRe = /(stra(ß|ss)e|str\.|weg|platz|damm|allee|ufer|ring|chaussee|markt|gasse|steig|promenade|zeile|pfad)\b.*\d/i;
+  if (plzIdx >= 0) {
+    const pl = lines[plzIdx];
+    const plz = pl.match(/\b1[0-4]\d{3}\s+Berlin(?:[-\s][A-ZÄÖÜ][\wäöüß-]+)?/)[0];
+    const sameLineStreet = pl.slice(0, pl.indexOf(plz.slice(0, 5))).replace(/[,\s]+$/, "");
+    const prev = plzIdx > 0 && streetRe.test(lines[plzIdx - 1]) ? lines[plzIdx - 1] : "";
+    r.adresse = [sameLineStreet && streetRe.test(sameLineStreet) ? sameLineStreet.replace(/^.*?(?=[A-ZÄÖÜ][\wäöüß.-]*\s*(stra|str\.|weg|platz|damm|allee|ufer|ring|chaussee))/i, "") : prev, plz].filter(Boolean).join(", ");
+  } else {
+    const st = lines.find((l) => streetRe.test(l) && !phoneRe.test(l));
+    if (st) r.adresse = st;
+  }
+  // Bezirk über Ortsteilnamen
+  const hay = text;
+  outer: for (const [bez, list] of Object.entries(ORTSTEILE)) {
+    for (const o of [bez, ...list]) {
+      if (new RegExp("(?<![\\p{L}])" + o.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?![\\p{L}])", "u").test(hay)) { r.bezirk = bez; break outer; }
+    }
+  }
+  if (/tiefenpsych/i.test(text)) r.verfahren.push("TP");
+  if (/verhaltensthera/i.test(text)) r.verfahren.push("VT");
+  if (/analytisch|psychoanaly/i.test(text)) r.verfahren.push("AP");
+  if (/systemisch/i.test(text)) r.verfahren.push("ST");
+  if (/nur\s+privat|privatpraxis|selbstzahl|privatpatient|keine\s+kassenzulassung/i.test(text)) r.typ = "privat";
+  else if (/kassenzulassung|kassensitz|alle\s+kassen|gesetzlich|gkv|kassenpatient/i.test(text)) r.typ = "kasse";
+  r.zeiten = parseZeiten(text);
+  // Name
+  const skip = (l) => /@|https?:|www\.|\b1[0-4]\d{3}\b|telefon|tel\.|fax|sprechzeit|erreichbar|verfahren|kasse|abrechnung|sprache|termin|^\+?\d/i.test(l) || streetRe.test(l) || l.length > 90;
+  const titled = lines.find((l) => !skip(l) && /(\bDr\.|\bProf\.|Dipl\.|M\.\s?Sc|B\.\s?Sc|\bFrau\b|\bHerr\b)/.test(l) && !/^Praxis\b/i.test(l));
+  const plain = lines.find((l) => !skip(l) && !/praxis|zentrum|mvz|psychotherapie|gemeinschaft/i.test(l) && /^[A-ZÄÖÜ][\wäöüß.'-]+(\s+[A-ZÄÖÜ][\wäöüß.'-]+){1,3}$/.test(l));
+  const nameLine = titled || plain || "";
+  r.name = cleanName(nameLine.replace(/^(Frau|Herr)\s+/, ""));
+  if (/\bFrau\b|Psychotherapeutin|Psychologin|Ärztin/.test(text)) r.anrede = "frau";
+  else if (/\bHerr\b|Psychotherapeut\b|Psychologe\b|Arzt\b/.test(text)) r.anrede = "herr";
+  const praxis = lines.find((l) => /^(praxis|mvz|zentrum)\b|psychotherapeutische praxis|praxisgemeinschaft/i.test(l) && l !== nameLine && l.length < 90);
+  if (praxis) r.praxis = praxis;
+  return r;
+}
+
+// ---------- Oberfläche: Grundgerüst ----------
+let route = { name: "start", arg: "" };
+const ui = { filter: { status: "", bezirk: "", verfahren: "", typ: "", q: "" }, mailTab: "sammel", pick: null, tplId: null, logFilter: "", printOnlyNeg: false, editTpl: null };
+
+function parseRoute() {
+  const h = decodeURIComponent(location.hash.replace(/^#\/?/, ""));
+  const [name, arg] = h.split("/");
+  route = { name: name || "start", arg: arg || "" };
+}
+const NAV = [["start", "Start", "home"], ["liste", "Liste", "list"], ["anrufen", "Anrufen", "phone"], ["mails", "E-Mails", "mail"], ["protokoll", "Protokoll", "log"], ["antrag", "Antrag", "doc"]];
+
+function render() {
+  const app = $("#app");
+  if (!D) { app.innerHTML = welcomeView(); return; }
+  const fu = followUps().filter((f) => f.due).length;
+  const nowN = windowsToday().filter((w) => w.state === "now").length;
+  const nav = NAV.map(([k, label, ic]) => {
+    const on = route.name === k || (k === "liste" && route.name === "t") || (k === "start" && ["ich", "daten"].includes(route.name)) ? " on" : "";
+    const b = k === "mails" && fu ? `<span class="badge">${fu}</span>` : k === "anrufen" && nowN ? `<span class="badge">${nowN}</span>` : "";
+    return `<a href="#${k}" class="${on.trim()}" data-nav="${k}">${ICON[ic]}<span>${label}</span>${b}</a>`;
+  }).join("");
+  const views = { start: startView, liste: listView, t: detailView, anrufen: callView, mails: mailView, protokoll: logView, antrag: antragView, ich: ichView, daten: datenView };
+  const v = (views[route.name] || startView)();
+  const pn = myName();
+  app.innerHTML = `
+    <header class="top">
+      <a class="brand" href="#start">${LOGO}<b>Therapieplatz</b></a>
+      <div class="top-actions">
+        <a class="chip-btn" href="#ich" aria-label="Meine Angaben"><span class="av">${esc(pn.slice(0, 1).toUpperCase() || "?")}</span><span>${esc(pn || "Ich")}</span></a>
+        <a class="icon-btn" href="#daten" aria-label="Daten und Sicherung">${ICON.gear}</a>
+      </div>
+    </header>
+    <nav class="tabs" aria-label="Bereiche">${nav}</nav>
+    <main id="main">${v}</main>`;
+}
+
+function welcomeView() {
+  return `<div class="welcome">
+    <div class="row">${LOGO.replace('width="34" height="34"', 'width="56" height="56"')}</div>
+    <h1>Schön, dass du da bist.</h1>
+    <p>Diese App hilft dir, bei der Suche nach einem Therapieplatz den Überblick zu behalten: wen du wann erreichen kannst, wem du geschrieben hast und welche Absagen du schon hast.</p>
+    <div class="card flat stack">
+      <p><b>Deine Daten bleiben auf diesem Gerät.</b> Es gibt keinen Server, kein Konto und kein Tracking. Für eine Sicherung kannst du später eine Datei exportieren.</p>
+    </div>
+    <form class="stack" data-form="welcome">
+      <label class="field"><span>Wie heißt du? (Vorname reicht)</span><input type="text" name="name" required maxlength="40" placeholder="z. B. Lena" autocomplete="off"></label>
+      <button class="btn" type="submit">Los geht's</button>
+    </form>
+  </div>`;
+}
+
+// ---------- Start ----------
+function nextHints() {
+  const i = D.ich, s = stats(), out = [];
+  const fu = followUps().filter((f) => f.due);
+  const now = windowsToday().filter((w) => w.state === "now");
+  const later = windowsToday().filter((w) => w.state === "later");
+  const step = currentStep();
+  if (s.platz) out.push({ h: "Du hast einen Platz.", p: "Wie schön. Gönn dir einen Moment zum Durchatmen. Nimm deine Unterlagen (PTV 11) zu den nächsten Terminen mit.", a: "" });
+  else if (s.erst) out.push({ h: "Du hast ein Erstgespräch vereinbart.", p: "Notier dir vorher in Ruhe, was du fragen möchtest. Danach entscheidest du, ob es passt.", a: `<a class="btn small" href="#liste">Zur Liste</a>` });
+  if (step === 1) out.push({ h: "Hol dir einen Termin für eine Sprechstunde.", p: "Das ist in der Regel der erste Schritt. Frag direkt bei Praxen an, oder lass dir über die 116117 einen Termin vermitteln.", a: `<a class="btn small" href="#ich">Sprechstunde eintragen</a>` });
+  else if (step === 2) out.push({ h: "Hast du das Formular PTV 11 bekommen?", p: "Du bekommst es nach der Sprechstunde. Trag ein, ob du es hast und ob „zeitnah erforderlich“ angekreuzt ist.", a: `<a class="btn small" href="#ich">PTV 11 eintragen</a>` });
+  if (now.length) out.push({ h: now.length === 1 ? `${tName(now[0].t)} ist gerade telefonisch erreichbar.` : `${now.length} Praxen sind gerade erreichbar.`, p: "Noch " + fmtDur(Math.max(...now.map((w) => w.mins))) + ". Ein Anruf reicht schon.", a: `<a class="btn small sage" href="#anrufen">Zum Anrufen</a>` });
+  else if (later.length) out.push({ h: `Heute um ${fromMin(later[0].von)} kannst du ${tName(later[0].t)} anrufen.`, p: "Das ist in " + fmtDur(later[0].mins) + ".", a: `<a class="btn small soft" href="#anrufen">Plan für heute</a>` });
+  if (fu.length) out.push({ h: plural(fu.length, "Anfrage wartet", "Anfragen warten") + " seit über einer Woche auf Antwort.", p: "Ein kurzes Nachfassen hilft oft.", a: `<a class="btn small soft" href="#mails" data-act="mailTab" data-tab="nach">Nachfassen</a>` });
+  if (!D.therapists.length && step >= 2) out.push({ h: "Trag ein paar Praxen ein.", p: "Du kannst einen Eintrag von einer Suchseite kopieren und hier einfügen. Die App erkennt Name, Telefon und Adresse.", a: `<button class="btn small" data-act="paste">Aus Text einfügen</button>` });
+  if (step === 3 && s.absagen >= 3 && !s.platz && !s.erst) out.push({ h: `Du hast schon ${s.absagen} Absagen dokumentiert.`, p: "Wenn es so weitergeht, kann der Weg über die Kostenerstattung eine Option sein. Schau dir an, was dazu gehört.", a: `<a class="btn small soft" href="#antrag">Kostenerstattung ansehen</a>` });
+  if (!out.length) out.push({ h: "Ein Schritt nach dem anderen.", p: "Schau in deine Liste, wen du als Nächstes anrufen oder anschreiben kannst.", a: `<a class="btn small" href="#liste">Zur Liste</a>` });
+  return out;
+}
+function startView() {
+  const i = D.ich, s = stats(), step = currentStep();
+  const hints = nextHints();
+  const first = hints[0], rest = hints.slice(1, 3);
+  const greet = (() => { const h = new Date().getHours(); return h < 11 ? "Guten Morgen" : h < 18 ? "Hallo" : "Guten Abend"; })();
+  const steps = [
+    { n: 1, h: "Psychotherapeutische Sprechstunde", done: !!(i.sprechstundeDatum || i.ptv11), hint: i.sprechstundeDatum ? "am " + fmtDate(i.sprechstundeDatum) : "",
+      body: `<p>Bevor eine Psychotherapie über die Krankenkasse beginnen kann, brauchst du in der Regel eine <b>psychotherapeutische Sprechstunde</b>. Dort wird geklärt, ob eine Behandlung sinnvoll ist und welches Verfahren passt. Eine Überweisung brauchst du dafür nicht.</p>
+        <p>Du kannst direkt bei Praxen anfragen. Wenn das nicht klappt: Die <b>Terminservicestelle</b> unter <a href="tel:116117">116117</a> oder online über den eTerminservice vermittelt dir einen Sprechstundentermin. Der Termin liegt laut 116117 höchstens etwa vier Wochen in der Zukunft, kann aber auch in einer anderen Praxis als deiner Wunschpraxis sein.</p>
+        <p><b>Wenn es dir akut schlecht geht:</b> Es gibt die psychotherapeutische Akutbehandlung (kurzfristige Hilfe ohne Antrag bei der Kasse). Auch dafür kann die 116117 Termine vermitteln. In einer Krise oder bei Gedanken an Suizid: Ruf den Notruf 112 an oder die TelefonSeelsorge unter <a href="tel:08001110111">0800 111 0 111</a> (kostenlos, rund um die Uhr).</p>
+        <div class="row"><a class="btn small soft" href="#ich">Termin eintragen</a></div>` },
+    { n: 2, h: "Formular PTV 11", done: !!i.ptv11, hint: i.ptv11 ? (i.zeitnah ? "zeitnah erforderlich" : "vorhanden") : "",
+      body: `<p>Nach der Sprechstunde bekommst du das Formular <b>PTV 11</b> („Individuelle Patienteninformation“). Darauf steht, was empfohlen wird. Heb es gut auf, du brauchst es später noch.</p>
+        <p>Schau, ob angekreuzt ist, dass eine Behandlung <b>„zeitnah erforderlich“</b> ist. Dann steht auf dem Formular auch ein Vermittlungscode. Damit kann dir die 116117 eine Akutbehandlung oder probatorische Sitzungen vermitteln, auch in einer anderen Praxis. Ohne dieses Kreuz geht das nicht.</p>
+        <div class="row"><a class="btn small soft" href="#ich">PTV 11 eintragen</a></div>` },
+    { n: 3, h: "Kassenplatz suchen", done: s.erst + s.platz > 0, hint: s.kontaktiert ? plural(s.kontaktiert, "Praxis", "Praxen") + " angefragt" : "",
+      body: `<p>Jetzt geht es darum, eine Praxis mit <b>Kassensitz</b> zu finden, die einen Platz frei hat. Das heißt leider oft: viele Anrufe in kurzen Telefonzeiten, viele E-Mails, lange Wartelisten. Das liegt nicht an dir.</p>
+        <p>Notier jeden Versuch, auch die erfolglosen. Diese Liste brauchst du, falls du später den Weg über die Kostenerstattung gehst.</p>
+        <div class="row"><a class="btn small" href="#liste">Zur Liste</a><a class="btn small ghost" href="#anrufen">Anrufen</a></div>` },
+    { n: 4, h: "Probatorische Sitzungen", done: s.platz > 0, hint: s.erst ? "Erstgespräch vereinbart" : "",
+      body: `<p>Hast du eine Praxis gefunden, folgen meist zwei bis vier <b>probatorische Sitzungen</b>. Ihr lernt euch kennen und klärt, ob die Chemie und das Verfahren passen. Danach stellt die Praxis gemeinsam mit dir den Antrag bei der Krankenkasse.</p>
+        <p class="small muted">Es ist in Ordnung, wenn es nicht passt. Du darfst weitersuchen.</p>` },
+    { n: 5, h: "Wenn nichts klappt: Kostenerstattung", done: D.antrag.antwort === "genehmigt", hint: D.antrag.gestelltAm ? "Antrag gestellt" : "",
+      body: `<p>Findest du trotz vieler Versuche keinen Kassenplatz in zumutbarer Zeit, kannst du bei deiner Krankenkasse beantragen, dass sie die Behandlung in einer <b>Privatpraxis</b> bezahlt (Kostenerstattung nach § 13 Abs. 3 SGB V).</p>
+        <p>Wichtig: Die Behandler:in muss <b>approbiert</b> sein (Heilpraktiker:innen für Psychotherapie zählen nicht). Stell den Antrag und warte die Entscheidung ab, <b>bevor</b> die eigentliche Therapie beginnt, sonst bleibst du womöglich auf den Kosten sitzen. Wie streng die Kassen prüfen, ist sehr unterschiedlich.</p>
+        <div class="row"><a class="btn small soft" href="#antrag">Zum Antrag</a>${i.weg !== "kostenerstattung" ? `<button class="btn small ghost" data-act="setWeg" data-weg="kostenerstattung">Ich gehe diesen Weg</button>` : `<button class="btn small ghost" data-act="setWeg" data-weg="">Doch nicht</button>`}</div>` },
+  ];
+  return `<div class="view">
+    <div class="hello"><h1>${greet}, ${esc(myName())}.</h1><p>Die Suche ist anstrengend. Du musst nicht alles an einem Tag schaffen. Hier siehst du, was als Nächstes dran ist.</p></div>
+    <section class="card next" aria-label="Nächster Schritt">
+      <div class="label">Nächster Schritt</div>
+      <h2>${esc(first.h)}</h2>
+      <p>${esc(first.p)}</p>
+      ${first.a ? `<div class="row" style="margin-top:12px">${first.a}</div>` : ""}
+      ${rest.length ? `<ul class="small">${rest.map((r) => `<li><b>${esc(r.h)}</b> ${esc(r.p)} ${r.a ? r.a.replace('class="btn small', 'class="linkbtn" data-x="').replace(/class="linkbtn" data-x="[^"]*"/, 'class="linkbtn"') : ""}</li>`).join("")}</ul>` : ""}
+    </section>
+    <section class="stats" aria-label="Fortschritt">
+      <div class="stat"><b>${s.kontaktiert}</b><span>Anfragen</span></div>
+      <div class="stat"><b>${s.versuche}</b><span>Kontakte</span></div>
+      <div class="stat"><b>${s.absagen}</b><span>Absagen</span></div>
+      <div class="stat"><b>${s.warte}</b><span>Wartelisten</span></div>
+    </section>
+    <section class="stack">
+      <div class="sec-title"><h2>Wegweiser</h2><span class="small muted">Schritt ${step} von 5</span></div>
+      <ol class="steps">${steps.map((st) => `<li class="step ${st.done ? "done" : ""} ${st.n === step ? "now" : ""}">
+        <span class="dot">${st.done ? "✓" : st.n}</span>
+        <details ${st.n === step ? "open" : ""}><summary><h3>${esc(st.h)}</h3><span class="hint">${st.n === step ? "Du bist hier" : esc(st.hint)}</span></summary><div class="body">${st.body}</div></details>
+      </li>`).join("")}</ol>
+    </section>
+    <section class="stack">
+      <h2>Hilfreiche Seiten</h2>
+      <div class="links">
+        <a href="https://www.kvberlin.de" target="_blank" rel="noopener noreferrer"><span>KV Berlin<small>Arzt- und Psychotherapeutensuche (unter „Für Patienten“)</small></span>${ICON.out}</a>
+        <a href="https://www.116117.de/de/psychotherapie.php" target="_blank" rel="noopener noreferrer"><span>116117.de<small>Infos zu Sprechstunde, Akutbehandlung und Terminservice</small></span>${ICON.out}</a>
+        <a href="https://www.eterminservice.de" target="_blank" rel="noopener noreferrer"><span>eTerminservice<small>Termine online buchen, z. B. mit Vermittlungscode</small></span>${ICON.out}</a>
+        <a href="https://www.therapie.de/psychotherapie/" target="_blank" rel="noopener noreferrer"><span>therapie.de<small>Therapeut:innensuche mit Filtern nach Verfahren</small></span>${ICON.out}</a>
+      </div>
+      <p class="note">Das hier sind allgemeine Informationen, keine Rechtsberatung. Die Einzelheiten hängen von deiner Krankenkasse und deiner Situation ab. Frag im Zweifel bei deiner Kasse oder einer Beratungsstelle (z. B. der Unabhängigen Patientenberatung) nach.</p>
+    </section>
+    <section class="row"><a class="btn ghost" href="#ich">Meine Angaben</a><a class="btn ghost" href="#daten">Daten &amp; Sicherung</a></section>
+  </div>`;
+}
+
+// ---------- Liste ----------
+function filteredTherapists() {
+  const f = ui.filter, q = f.q.trim().toLowerCase();
+  return D.therapists.filter((t) => (!f.status || t.status === f.status) && (!f.bezirk || t.bezirk === f.bezirk) && (!f.verfahren || t.verfahren.includes(f.verfahren)) && (!f.typ || t.typ === f.typ)
+    && (!q || [t.name, t.praxis, t.adresse, t.bezirk, t.notizen].join(" ").toLowerCase().includes(q)))
+    .sort((a, b) => STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) || tName(a).localeCompare(tName(b)));
+}
+function tCard(t) {
+  const nw = t.telefon && activeT(t) ? nextWindowText(t) : "";
+  return `<button class="tcard" data-act="open" data-id="${esc(t.id)}">
+    <div class="row between" style="flex-wrap:nowrap;align-items:flex-start"><span class="name">${esc(tName(t))}</span><span class="pill st-${esc(t.status)}">${esc(STATUS[t.status] || t.status)}${t.status === "warteliste" && t.warteWochen ? " · " + esc(t.warteWochen) + " Wo." : ""}</span></div>
+    ${t.praxis && t.name ? `<div class="meta">${esc(t.praxis)}</div>` : ""}
+    <div class="tags">${t.verfahren.map((v) => `<span class="tag ${v === "TP" ? "tp" : ""}">${esc(VERFAHREN[v] || v)}</span>`).join("")}${t.typ ? `<span class="tag">${esc(TYP[t.typ])}</span>` : ""}${t.bezirk ? `<span class="meta">${esc(t.bezirk)}</span>` : ""}</div>
+    ${nw ? `<div class="meta">${nw.startsWith("Jetzt") ? '<span class="live"></span>' : ""}${esc(nw)}</div>` : ""}
+  </button>`;
+}
+function listView() {
+  const f = ui.filter, list = filteredTherapists();
+  const counts = {};
+  D.therapists.forEach((t) => (counts[t.status] = (counts[t.status] || 0) + 1));
+  const bez = [...new Set([...BEZIRKE, ...D.therapists.map((t) => t.bezirk).filter(Boolean)])];
+  return `<div class="view">
+    <div class="head"><h1>Therapeut:innen</h1><p>${D.therapists.length ? plural(D.therapists.length, "Eintrag", "Einträge") + ". Tipp: Kopier einen Eintrag von einer Suchseite und füg ihn hier ein." : "Noch leer. Fang mit ein, zwei Praxen an."}</p></div>
+    <div class="row"><button class="btn" data-act="addT">+ Neu</button><button class="btn soft" data-act="paste">Aus Text einfügen</button></div>
+    ${D.therapists.length ? `
+    <div class="chips" role="group" aria-label="Nach Status filtern">
+      <button class="chip ${!f.status ? "on" : ""}" data-act="fStatus" data-v="">Alle<span class="n">${D.therapists.length}</span></button>
+      ${STATUS_ORDER.filter((s) => counts[s]).map((s) => `<button class="chip ${f.status === s ? "on" : ""}" data-act="fStatus" data-v="${s}">${esc(STATUS[s])}<span class="n">${counts[s]}</span></button>`).join("")}
+    </div>
+    <div class="filters">
+      <select data-change="fBezirk" aria-label="Bezirk"><option value="">Bezirk</option>${bez.map((b) => `<option ${f.bezirk === b ? "selected" : ""} value="${esc(b)}">${esc(b)}</option>`).join("")}</select>
+      <select data-change="fVerfahren" aria-label="Verfahren"><option value="">Verfahren</option>${Object.entries(VERFAHREN).map(([k, v]) => `<option ${f.verfahren === k ? "selected" : ""} value="${k}">${esc(v)}</option>`).join("")}</select>
+      <select data-change="fTyp" aria-label="Kasse oder privat"><option value="">Abrechnung</option><option value="kasse" ${f.typ === "kasse" ? "selected" : ""}>Kassensitz</option><option value="privat" ${f.typ === "privat" ? "selected" : ""}>Privatpraxis</option></select>
+    </div>
+    <input type="search" data-input="fQ" placeholder="Suchen nach Name, Praxis, Adresse …" value="${esc(f.q)}" aria-label="Suchen">
+    <div class="tlist">${list.map(tCard).join("") || `<div class="empty">Keine Treffer mit diesen Filtern.</div>`}</div>` : `
+    <div class="card empty"><h3>Deine Liste ist noch leer</h3><p>Such zum Beispiel bei der KV Berlin oder auf therapie.de nach Praxen in deiner Nähe. Kopier den ganzen Eintrag und tipp auf „Aus Text einfügen“.</p></div>`}
+  </div>`;
+}
+
+// ---------- Detail ----------
+function detailView() {
+  const t = T(route.arg);
+  if (!t) return `<div class="view"><div class="card empty"><h3>Eintrag nicht gefunden</h3><a class="btn" href="#liste">Zur Liste</a></div></div>`;
+  const ls = logsFor(t.id);
+  const site = safeUrl(t.website);
+  const zeiten = t.zeiten.slice().sort((a, b) => a.tag - b.tag || String(a.von).localeCompare(b.von)).map((z) => `${TAGE[z.tag]} ${esc(z.von)}–${esc(z.bis)}`).join(", ");
+  const nw = t.telefon ? nextWindowText(t) : "";
+  return `<div class="view">
+    <a href="#liste" class="small" style="font-weight:700">← Zur Liste</a>
+    <div class="head"><h1>${esc(tName(t))}</h1>${t.praxis && t.name ? `<p>${esc(t.praxis)}</p>` : ""}</div>
+    <div class="row">
+      ${t.telefon ? `<a class="btn call" href="${esc(telHref(t.telefon))}" data-act="call" data-id="${esc(t.id)}">${ICON.phone.replace("<svg", '<svg width="18" height="18"')} Anrufen</a>` : ""}
+      ${t.email ? `<button class="btn soft" data-act="mailOne" data-id="${esc(t.id)}">${ICON.mail.replace("<svg", '<svg width="18" height="18"')} E-Mail</button>` : ""}
+      <button class="btn ghost" data-act="logReply" data-id="${esc(t.id)}">${ICON.inbox} Antwort / Notiz</button>
+    </div>
+    ${nw ? `<p class="small">${nw.startsWith("Jetzt") ? '<span class="live"></span>' : ""}${esc(nw)}</p>` : ""}
+    <section class="card stack">
+      <h3>Status</h3>
+      <div class="statusbar">${STATUS_ORDER.map((s) => `<button class="${t.status === s ? "on st-" + s : ""}" data-act="setStatus" data-id="${esc(t.id)}" data-s="${s}">${esc(STATUS[s])}</button>`).join("")}</div>
+      ${t.status === "warteliste" ? `<label class="field"><span>Erwartete Wartezeit (Wochen)</span><input type="number" min="0" max="200" inputmode="numeric" value="${esc(t.warteWochen)}" data-change="warte" data-id="${esc(t.id)}"></label>` : ""}
+    </section>
+    <section class="card stack">
+      <div class="row between"><h3>Angaben</h3><button class="btn small ghost" data-act="editT" data-id="${esc(t.id)}">Bearbeiten</button></div>
+      <dl class="dl">
+        ${t.adresse ? `<dt>Adresse</dt><dd>${esc(t.adresse)}</dd>` : ""}
+        ${t.bezirk ? `<dt>Bezirk</dt><dd>${esc(t.bezirk)}</dd>` : ""}
+        ${t.verfahren.length ? `<dt>Verfahren</dt><dd>${t.verfahren.map((v) => esc(VERFAHREN[v] || v)).join(", ")}</dd>` : ""}
+        <dt>Abrechnung</dt><dd>${esc(TYP[t.typ] || "Unklar")}</dd>
+        ${t.telefon ? `<dt>Telefon</dt><dd><a href="${esc(telHref(t.telefon))}" data-act="call" data-id="${esc(t.id)}">${esc(t.telefon)}</a></dd>` : ""}
+        ${zeiten ? `<dt>Telefonzeiten</dt><dd>${zeiten}</dd>` : ""}
+        ${t.email ? `<dt>E-Mail</dt><dd>${esc(t.email)}</dd>` : ""}
+        ${t.website ? `<dt>Website</dt><dd>${site ? `<a href="${esc(site)}" target="_blank" rel="noopener noreferrer">${esc(t.website)}</a>` : esc(t.website)}</dd>` : ""}
+      </dl>
+      ${t.notizen ? `<div class="preview">${esc(t.notizen)}</div>` : ""}
+    </section>
+    <section class="stack">
+      <h2>Verlauf</h2>
+      ${ls.length ? `<ul class="timeline">${ls.map(logItem).join("")}</ul>` : `<p class="muted">Noch kein Kontakt. Wenn du anrufst oder schreibst, landet es automatisch hier.</p>`}
+    </section>
+    <div class="row"><button class="btn danger small" data-act="delT" data-id="${esc(t.id)}">Eintrag löschen</button></div>
+  </div>`;
+}
+function logItem(l) {
+  const r = RES[l.ergebnis];
+  const inbound = r?.reply && l.kanal !== "telefon";
+  const ic = l.kanal === "telefon" ? ICON.phone : l.kanal === "email" ? ICON.mail : ICON.note;
+  return `<li><span class="ic ${inbound ? "in" : ""}">${ic.replace("<svg", '<svg width="18" height="18"')}</span><div>
+    <div class="row between" style="gap:6px"><b>${esc(r?.label || l.ergebnis)}${l.ergebnis === "warteliste" && l.wochen ? " (" + esc(l.wochen) + " Wochen)" : ""}</b><button class="linkbtn small" data-act="editLog" data-id="${esc(l.id)}">ändern</button></div>
+    <div class="when">${esc(KANAL[l.kanal] || l.kanal)} · ${fmtDate(l.ts)}, ${fmtTime(l.ts)} Uhr</div>
+    ${l.text ? `<div class="txt">${esc(l.text)}</div>` : ""}
+  </div></li>`;
+}
+
+// ---------- Anrufen ----------
+function callView() {
+  const ws = windowsToday();
+  const now = ws.filter((w) => w.state === "now");
+  const later = ws.filter((w) => w.state === "later");
+  const noTimes = D.therapists.filter((t) => t.telefon && activeT(t) && !t.zeiten.length);
+  const callBtn = (t) => `<a class="btn call small" href="${esc(telHref(t.telefon))}" data-act="call" data-id="${esc(t.id)}">Anrufen</a>`;
+  const nextAny = !ws.length ? D.therapists.filter((t) => t.telefon && activeT(t) && t.zeiten.length).map((t) => ({ t, w: nextWindow(t) })).filter((x) => x.w).sort((a, b) => a.w.off - b.w.off || a.w.von - b.w.von)[0] : null;
+  const today = TAGE_LANG[wd(new Date())];
+  return `<div class="view" data-live="1">
+    <div class="head"><h1>Anrufen</h1><p>Viele Praxen sind nur kurz am Telefon erreichbar. Hier siehst du, wer gerade dran ist. Nach dem Anruf trägst du mit einem Tipp ein, wie es lief.</p></div>
+    <section class="stack">
+      <h2><span class="live"></span>Jetzt erreichbar</h2>
+      ${now.length ? `<div class="card calllist">${now.map((w) => `<div class="callrow"><div><div class="who">${esc(tName(w.t))}</div><div class="when">bis ${fromMin(w.bis)} Uhr · <span class="count" data-until="${w.bis}">noch ${fmtDur(w.mins)}</span></div></div>${callBtn(w.t)}</div>`).join("")}</div>`
+        : `<div class="card soft"><p class="muted">Gerade hat niemand aus deiner Liste Telefonzeit${later.length ? `. Als Nächstes: <b>${esc(tName(later[0].t))}</b> um ${fromMin(later[0].von)} Uhr (in ${fmtDur(later[0].mins)}).` : "."}</p></div>`}
+    </section>
+    <section class="stack">
+      <div class="sec-title"><h2>Heute anrufen</h2><span class="small muted">${esc(today)}</span></div>
+      ${ws.length ? `<div class="card"><ul class="plan">${ws.map((w) => `<li class="${w.state}"><span class="t">${fromMin(w.von)}–${fromMin(w.bis)}</span><div><b>${esc(tName(w.t))}</b><div class="tiny muted">${w.state === "now" ? `<span class="count" data-until="${w.bis}">noch ${fmtDur(w.mins)}</span>` : w.state === "later" ? `<span class="count later" data-from="${w.von}">in ${fmtDur(w.mins)}</span>` : "vorbei"} · ${esc(STATUS[w.t.status])}</div></div>${w.state !== "past" ? callBtn(w.t) : `<span></span>`}</li>`).join("")}</ul></div>`
+        : `<div class="card soft"><p class="muted">Für heute sind keine Telefonzeiten eingetragen.${nextAny ? ` Nächste Gelegenheit: <b>${esc(tName(nextAny.t))}</b>, ${nextAny.w.off === 1 ? "morgen" : esc(TAGE_LANG[nextAny.w.tag])} um ${fromMin(nextAny.w.von)} Uhr.` : " Trag bei deinen Praxen die Telefonzeiten ein, dann planen wir hier deinen Tag."}</p></div>`}
+    </section>
+    ${noTimes.length ? `<section class="stack"><h2>Ohne bekannte Telefonzeit</h2><div class="card calllist">${noTimes.map((t) => `<div class="callrow"><div><div class="who">${esc(tName(t))}</div><div class="when">${esc(STATUS[t.status])}</div></div>${callBtn(t)}</div>`).join("")}</div></section>` : ""}
+    <p class="note">Ein Anruf auf den Anrufbeantworter zählt auch. Sprich langsam Namen und Nummer drauf, und sag, wann du gut erreichbar bist.</p>
+  </div>`;
+}
+function tickCountdowns() {
+  if (!D || route.name !== "anrufen") return;
+  const n = nowMin();
+  let stale = false;
+  $$("[data-until]").forEach((el) => { const m = +el.dataset.until - n; if (m <= 0) stale = true; else el.textContent = "noch " + fmtDur(m); });
+  $$("[data-from]").forEach((el) => { const m = +el.dataset.from - n; if (m <= 0) stale = true; else el.textContent = "in " + fmtDur(m); });
+  if (stale && !$(".scrim")) render();
+}
+
+// ---------- E-Mails ----------
+function mailView() {
+  const tab = ui.mailTab;
+  const fu = followUps();
+  const body = tab === "vorlagen" ? tplEditor() : tab === "nach" ? followView(fu) : sammelView();
+  return `<div class="view">
+    <div class="head"><h1>E-Mails</h1><p>Schreib mehreren Praxen auf einmal, jeweils persönlich angesprochen. Jede gesendete Mail landet im Protokoll.</p></div>
+    <div class="seg" role="tablist">
+      <button class="${tab === "sammel" ? "on" : ""}" data-act="mailTab" data-tab="sammel">Sammelanfrage</button>
+      <button class="${tab === "nach" ? "on" : ""}" data-act="mailTab" data-tab="nach">Nachfassen${fu.filter((f) => f.due).length ? " (" + fu.filter((f) => f.due).length + ")" : ""}</button>
+      <button class="${tab === "vorlagen" ? "on" : ""}" data-act="mailTab" data-tab="vorlagen">Vorlagen</button>
+    </div>
+    ${body}
+  </div>`;
+}
+function sammelView() {
+  const q = D.queue;
+  if (q && q.items && q.idx < q.items.length) {
+    const t = T(q.items[q.idx]);
+    const tpl = D.templates.find((x) => x.id === q.tpl) || D.templates[0];
+    if (!t || !t.email) { q.idx++; save(); return sammelView(); }
+    return `<section class="card stack" data-queue="1">
+      <div class="row between"><b>E-Mail ${q.idx + 1} von ${q.items.length}</b><span class="small muted">${esc(tpl.name)}</span></div>
+      <div class="progress"><i style="width:${Math.round((q.idx / q.items.length) * 100)}%"></i></div>
+      <h2>${esc(tName(t))}</h2>
+      <p class="small muted">an ${esc(t.email)}</p>
+      <div class="preview"><b>${esc(fill(tpl.subject, t))}</b>\n\n${esc(fill(tpl.body, t))}</div>
+      <a class="btn block" href="${esc(mailtoFor(t, tpl))}" data-act="queueSend">Nächste E-Mail öffnen</a>
+      <p class="tiny muted">Dein Mailprogramm öffnet sich mit dem fertigen Text. Schick sie dort ab und komm dann hierher zurück. Die Mail wird beim Öffnen als gesendet notiert.</p>
+      <div class="row"><button class="btn ghost small" data-act="queueSkip">Überspringen</button><button class="btn ghost small" data-act="queueStop">Abbrechen</button></div>
+    </section>`;
+  }
+  if (q && q.items && q.idx >= q.items.length) {
+    return `<section class="card stack"><h2>Fertig, ${plural(q.sent || 0, "E-Mail", "E-Mails")} vorbereitet.</h2><p>Gut gemacht. In ${FOLLOW_DAYS} Tagen erinnert dich die App, bei wem du nachfassen kannst.</p><button class="btn" data-act="queueStop">Neue Sammelanfrage</button></section>`;
+  }
+  const withMail = D.therapists.filter((t) => t.email && activeT(t));
+  if (!ui.pick) ui.pick = new Set(withMail.filter((t) => t.status === "neu").map((t) => t.id));
+  const tplId = ui.tplId || D.templates[0]?.id;
+  const tpl = D.templates.find((x) => x.id === tplId) || D.templates[0];
+  const firstSel = withMail.find((t) => ui.pick.has(t.id));
+  const missing = ["kasse"].filter((k) => !D.ich[k]);
+  return `<section class="stack">
+    <label class="field"><span>Vorlage</span><select data-change="tplPick">${D.templates.map((x) => `<option value="${esc(x.id)}" ${x.id === tpl?.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
+    ${missing.length ? `<p class="small">Tipp: Trag unter <a href="#ich">Meine Angaben</a> deine Krankenkasse und Verfügbarkeit ein, dann werden die Mails vollständiger.</p>` : ""}
+    <div class="card stack">
+      <div class="row between"><h3>An wen?</h3><span class="row" style="gap:12px"><button class="linkbtn small" data-act="pickAll">Alle</button><button class="linkbtn small" data-act="pickNone">Keine</button></span></div>
+      ${withMail.length ? `<div class="pick">${withMail.map((t) => `<label><input type="checkbox" data-change="pick" value="${esc(t.id)}" ${ui.pick.has(t.id) ? "checked" : ""}><span><b>${esc(tName(t))}</b><br><span class="tiny muted">${esc(t.email)}</span></span><span class="pill st-${esc(t.status)}">${esc(STATUS[t.status])}</span></label>`).join("")}</div>`
+        : `<p class="muted">Noch niemand mit E-Mail-Adresse in deiner Liste.</p>`}
+    </div>
+    ${firstSel && tpl ? `<details class="card flat"><summary><b>Vorschau für ${esc(tName(firstSel))}</b></summary><div class="preview" style="margin-top:10px"><b>${esc(fill(tpl.subject, firstSel))}</b>\n\n${esc(fill(tpl.body, firstSel))}</div></details>` : ""}
+    <button class="btn block" data-act="queueStart" ${ui.pick.size && tpl ? "" : "disabled"}>${ui.pick.size ? `${plural(ui.pick.size, "E-Mail", "E-Mails")} nacheinander schreiben` : "Wähle mindestens eine Praxis"}</button>
+  </section>`;
+}
+function followView(fu) {
+  if (!fu.length) return `<div class="card empty"><h3>Nichts offen</h3><p>Wenn du eine E-Mail schickst und nach ${FOLLOW_DAYS} Tagen keine Antwort eingetragen ist, erscheint sie hier.</p></div>`;
+  const tpl = D.templates.find((x) => x.id === "t-nach") || D.templates[0];
+  return `<section class="stack">${fu.map((f) => `<div class="card stack">
+    <div class="row between"><b>${esc(tName(f.t))}</b><span class="pill ${f.due ? "st-rueckruf" : ""}">${f.due ? "nachfassen" : "ab " + fmtDate(f.dueDate)}</span></div>
+    <p class="small muted">Geschrieben am ${fmtDate(f.sent.ts)} (vor ${plural(f.age, "Tag", "Tagen")}). Noch keine Antwort eingetragen.</p>
+    <div class="row">
+      ${f.t.email ? `<a class="btn small" href="${esc(mailtoFor(f.t, tpl))}" data-act="followSend" data-id="${esc(f.t.id)}" data-log="${esc(f.sent.id)}">Nachfassen</a>` : ""}
+      ${f.t.telefon ? `<a class="btn small sage" href="${esc(telHref(f.t.telefon))}" data-act="call" data-id="${esc(f.t.id)}">Anrufen</a>` : ""}
+      <button class="btn small ghost" data-act="logReply" data-id="${esc(f.t.id)}">Antwort eintragen</button>
+      <button class="linkbtn small" data-act="followDone" data-log="${esc(f.sent.id)}">Erledigt</button>
+    </div>
+  </div>`).join("")}</section>`;
+}
+function tplEditor() {
+  const id = ui.editTpl || D.templates[0]?.id;
+  const tpl = D.templates.find((x) => x.id === id);
+  return `<section class="stack">
+    <div class="chips">${D.templates.map((x) => `<button class="chip ${x.id === id ? "on" : ""}" data-act="editTpl" data-id="${esc(x.id)}">${esc(x.name)}</button>`).join("")}<button class="chip" data-act="newTpl">+ Neue Vorlage</button></div>
+    ${tpl ? `<form class="card stack" data-form="tpl" data-id="${esc(tpl.id)}">
+      <label class="field"><span>Name der Vorlage</span><input type="text" name="name" value="${esc(tpl.name)}" maxlength="80"></label>
+      <label class="field"><span>Betreff</span><input type="text" name="subject" value="${esc(tpl.subject)}"></label>
+      <label class="field"><span>Text</span><textarea name="body" rows="14" id="tplBody">${esc(tpl.body)}</textarea></label>
+      <div class="stack" style="gap:6px"><span class="small muted">Platzhalter einfügen (werden pro Praxis ersetzt; Zeilen mit leeren Angaben fallen weg):</span>
+        <div class="ph">${PH_LIST.map(([k, l]) => `<button type="button" data-act="insPh" data-k="${k}" title="${esc(l)}">{${k}}</button>`).join("")}</div></div>
+      <div class="row"><button class="btn" type="submit">Speichern</button><button class="btn danger small" type="button" data-act="delTpl" data-id="${esc(tpl.id)}">Löschen</button></div>
+    </form>` : ""}
+    <button class="linkbtn small" data-act="resetTpl">Standardvorlagen wiederherstellen</button>
+  </section>`;
+}
+
+// ---------- Protokoll ----------
+function logRows(onlyNeg) {
+  return D.log.filter((l) => l.ergebnis !== "notiz" && (!onlyNeg || ["absage", "warteliste", "nicht_erreicht", "ab", "besetzt"].includes(l.ergebnis)))
+    .filter((l) => !ui.logFilter || l.ergebnis === ui.logFilter || l.kanal === ui.logFilter)
+    .sort((a, b) => a.ts.localeCompare(b.ts));
+}
+function logView() {
+  const s = stats();
+  const rows = logRows(false).slice().reverse();
+  const opts = [["", "Alle Einträge"], ["telefon", "Nur Telefon"], ["email", "Nur E-Mail"], ["absage", "Nur Absagen"], ["warteliste", "Nur Wartelisten"]];
+  return `<div class="view">
+    <div class="head"><h1>Kontaktprotokoll</h1><p>Alle deine Versuche an einem Ort. Wenn du eine Kostenerstattung beantragst, möchten Krankenkassen meist sehen, dass du dich mehrfach erfolglos um einen Kassenplatz bemüht hast. Diese Liste ist dein Nachweis.</p></div>
+    <section class="stats">
+      <div class="stat"><b>${D.log.filter((l) => l.ergebnis !== "notiz").length}</b><span>Versuche</span></div>
+      <div class="stat"><b>${s.kontaktiert}</b><span>Praxen</span></div>
+      <div class="stat"><b>${s.absagen}</b><span>Absagen</span></div>
+      <div class="stat"><b>${s.warte}</b><span>Wartelisten</span></div>
+    </section>
+    <div class="row"><button class="btn" data-act="printLog">Drucken / als PDF</button><button class="btn ghost" data-act="addLog">+ Eintrag nachtragen</button></div>
+    <label class="check small"><input type="checkbox" data-change="printNeg" ${ui.printOnlyNeg ? "checked" : ""}><span>Beim Drucken nur erfolglose Versuche (Absagen, Wartelisten, nicht erreicht)</span></label>
+    <select data-change="logFilter" aria-label="Filter">${opts.map(([k, l]) => `<option value="${k}" ${ui.logFilter === k ? "selected" : ""}>${l}</option>`).join("")}</select>
+    ${rows.length ? `<div class="card" style="padding:4px 14px"><table class="ptable"><thead><tr><th>Datum</th><th>Kanal</th><th>Therapeut:in</th><th>Ergebnis</th><th>Wartezeit</th></tr></thead><tbody>
+      ${rows.map((l) => `<tr data-act="editLog" data-id="${esc(l.id)}"><td class="c-date nowrap">${fmtDate(l.ts)} · ${fmtTime(l.ts)}</td><td class="c-kanal">${esc(KANAL[l.kanal] || l.kanal)}</td><td class="c-name">${esc(T(l.tid) ? tName(T(l.tid)) : l.tname || "Gelöscht")}</td><td class="c-res">${esc(RES[l.ergebnis]?.label || l.ergebnis)}</td><td class="c-wait">${l.ergebnis === "warteliste" && l.wochen ? esc(l.wochen) + " Wochen" : ""}</td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="card empty"><h3>Noch keine Einträge</h3><p>Sobald du anrufst oder E-Mails schreibst, erscheint hier alles mit Datum und Uhrzeit.</p></div>`}
+  </div>`;
+}
+function printLog() {
+  const rows = logRows(ui.printOnlyNeg);
+  const i = D.ich, s = stats();
+  const first = rows[0], last = rows[rows.length - 1];
+  const html = `<h1>Nachweis meiner Bemühungen um einen Psychotherapieplatz</h1>
+    <div class="meta">${esc(i.vollname || i.name)}${i.geburt ? ", geb. " + fmtDate(i.geburt) : ""}${i.versNr ? " · Versichertennummer: " + esc(i.versNr) : ""}${i.kasse ? " · " + esc(i.kasse) : ""}<br>
+    ${rows.length ? "Zeitraum: " + fmtDate(first.ts) + " bis " + fmtDate(last.ts) + " · " : ""}Erstellt am ${fmtDate(isoDate())}</div>
+    <div class="sum">${plural(rows.length, "dokumentierter Kontaktversuch", "dokumentierte Kontaktversuche")} bei ${plural(new Set(rows.map((r) => r.tid)).size, "Praxis", "Praxen")}. Davon ${plural(s.absagen, "Absage", "Absagen")} und ${plural(s.warte, "Warteliste", "Wartelisten")} (Stand aktuell).</div>
+    <table><thead><tr><th>Nr.</th><th>Datum</th><th>Uhrzeit</th><th>Therapeut:in / Praxis</th><th>Kanal</th><th>Ergebnis</th><th>Wartezeit</th></tr></thead><tbody>
+    ${rows.map((l, n) => { const t = T(l.tid); return `<tr><td>${n + 1}</td><td>${fmtDate(l.ts)}</td><td>${fmtTime(l.ts)}</td><td>${esc(t ? tName(t) : l.tname)}${t && t.adresse ? "<br>" + esc(t.adresse) : ""}${t && t.telefon ? "<br>Tel. " + esc(t.telefon) : ""}</td><td>${esc(KANAL[l.kanal] || l.kanal)}</td><td>${esc(RES[l.ergebnis]?.label || l.ergebnis)}</td><td>${l.ergebnis === "warteliste" && l.wochen ? esc(l.wochen) + " Wochen" : ""}</td></tr>`; }).join("")}
+    </tbody></table>
+    <div class="foot">Ich versichere, dass die Angaben richtig sind.<br><br><br>________________________________<br>Ort, Datum, Unterschrift</div>`;
+  doPrint(html);
+}
+function doPrint(html) {
+  $("#print").innerHTML = html;
+  setTimeout(() => window.print(), 30);
+}
+
+// ---------- Antrag ----------
+const CHECK = [
+  ["ptv11", "PTV 11 aus der Sprechstunde", "Am besten mit dem Vermerk „zeitnah erforderlich“. Kopie beilegen, Original behalten."],
+  ["absageliste", "Absageliste / Kontaktprotokoll", "Aus dem Protokoll-Bereich drucken. Kassen erwarten oft mehrere dokumentierte Absagen."],
+  ["dringlichkeit", "Bescheinigung über die Dringlichkeit", "Zum Beispiel von der Praxis aus der Sprechstunde oder deiner Hausärztin, dass die Behandlung notwendig und dringend ist."],
+  ["privat", "Privatpraxis mit Approbation gefunden", "Die Behandler:in muss approbiert sein und ein anerkanntes Verfahren anbieten."],
+  ["kostenvoranschlag", "Kostenvoranschlag / Antrag der Privatpraxis", "Mit Verfahren, geplanter Stundenzahl und Kosten pro Sitzung."],
+  ["approbation", "Nachweis der Approbation", "Kopie der Approbationsurkunde, meist von der Praxis."],
+  ["konsiliar", "Konsiliarbericht (optional)", "Bericht von Hausärztin oder Hausarzt, dass körperliche Ursachen abgeklärt sind. Wird oft ohnehin später gebraucht."],
+  ["brief", "Antragsschreiben unterschrieben", "Unten vorbereitet. Prüfen, ergänzen, ausdrucken, unterschreiben."],
+  ["kopien", "Von allem Kopien behalten", "Und den Versand nachweisbar machen, z. B. per Einschreiben, Fax mit Sendebericht oder persönlich gegen Eingangsstempel."],
+];
+function antragFacts() {
+  const rows = D.log.filter((l) => l.ergebnis !== "notiz").sort((a, b) => a.ts.localeCompare(b.ts));
+  const praxen = new Set(rows.map((r) => r.tid));
+  const abs = D.therapists.filter((t) => t.status === "absage");
+  const wl = D.therapists.filter((t) => t.status === "warteliste");
+  const wochen = wl.map((t) => +t.warteWochen).filter((n) => n > 0);
+  const offen = D.therapists.filter((t) => t.status === "angefragt").length;
+  return { rows, praxen: praxen.size, abs: abs.length, wl: wl.length, wMin: wochen.length ? Math.min(...wochen) : null, wMax: wochen.length ? Math.max(...wochen) : null, offen, from: rows[0]?.ts, to: rows[rows.length - 1]?.ts };
+}
+function antragLetter() {
+  const i = D.ich, a = D.antrag, f = antragFacts();
+  const p = T(a.privatTid);
+  const pDesc = p ? `${anredeShort(p)}${tName(p)}${p.praxis && p.name ? ", " + p.praxis : ""}${p.adresse ? ", " + p.adresse : ""}` : "[Name und Anschrift der Privatpraxis]";
+  const vf = VERFAHREN_LANG[i.verfahren] || VERFAHREN_LANG.TP;
+  const wz = f.wl ? ` und ${plural(f.wl, "Platz auf einer Warteliste", "Plätze auf Wartelisten")}${f.wMin != null ? ` mit Wartezeiten von ${f.wMin === f.wMax ? f.wMin : f.wMin + " bis " + f.wMax} Wochen` : ""}` : "";
+  const anlagen = ["Formular PTV 11 (Kopie)", "Aufstellung meiner Kontaktversuche (Absageliste)"];
+  if (a.check.dringlichkeit) anlagen.push("Bescheinigung über die Dringlichkeit der Behandlung");
+  anlagen.push("Kostenvoranschlag bzw. Antrag der Behandlerin/des Behandlers", "Nachweis der Approbation");
+  if (a.check.konsiliar) anlagen.push("Konsiliarbericht");
+  return `${i.vollname || i.name || "[Dein Name]"}
+${i.adresse || "[Deine Anschrift]"}
+${[i.telefon, i.email].filter(Boolean).join(" · ")}
+
+${i.kasse || "[Name der Krankenkasse]"}
+${i.kasseAdresse || "[Anschrift der Krankenkasse]"}
+
+Berlin, ${fmtDate(isoDate())}
+
+Antrag auf Kostenerstattung für eine außervertragliche Psychotherapie nach § 13 Abs. 3 SGB V
+Versichertennummer: ${i.versNr || "[Versichertennummer]"}${i.geburt ? ", geboren am " + fmtDate(i.geburt) : ""}
+
+Sehr geehrte Damen und Herren,
+
+hiermit beantrage ich die Übernahme der Kosten für eine ambulante Psychotherapie (${vf}) bei ${pDesc} im Wege der Kostenerstattung nach § 13 Abs. 3 SGB V.
+
+${i.sprechstundeDatum ? `Am ${fmtDate(i.sprechstundeDatum)} habe ich eine psychotherapeutische Sprechstunde wahrgenommen${i.sprechstundeBei ? " (" + i.sprechstundeBei + ")" : ""}.` : "Ich habe eine psychotherapeutische Sprechstunde wahrgenommen [Datum ergänzen]."} Dabei wurde festgestellt, dass eine ambulante Psychotherapie notwendig ist${i.zeitnah ? " und zeitnah erforderlich ist" : ""} (siehe beiliegendes Formular PTV 11).
+
+Seitdem habe ich mich intensiv, aber erfolglos um einen Therapieplatz bei Psychotherapeutinnen und Psychotherapeuten mit Kassenzulassung bemüht. ${f.rows.length ? `Zwischen dem ${fmtDate(f.from)} und dem ${fmtDate(f.to)} habe ich ${plural(f.praxen, "Praxis", "Praxen")} kontaktiert (${plural(f.rows.length, "dokumentierter Kontaktversuch", "dokumentierte Kontaktversuche")}). Ich habe ${plural(f.abs, "Absage", "Absagen")}${wz} erhalten${f.offen ? `; ${plural(f.offen, "Praxis hat", "Praxen haben")} bisher nicht geantwortet` : ""}.` : "[Anzahl der kontaktierten Praxen, Absagen und Wartezeiten ergänzen.]"} Eine Aufstellung aller Kontaktversuche liegt bei.${i.tss ? "\n\nAuch über die Terminservicestelle (116117) konnte mir kein Therapieplatz in zumutbarer Zeit vermittelt werden." : ""}
+
+Eine weitere Wartezeit ist mir nicht zumutbar, ${i.dringlichkeit ? "denn: " + i.dringlichkeit : "[hier kurz beschreiben, warum du nicht länger warten kannst. Nur so viel, wie du teilen möchtest.]"}
+
+Da mir die Krankenkasse die notwendige Behandlung nicht rechtzeitig als Sachleistung zur Verfügung stellen kann, bitte ich um Genehmigung der Behandlung bei der oben genannten approbierten Behandlerin bzw. dem oben genannten approbierten Behandler. Bitte teilen Sie mir Ihre Entscheidung innerhalb der Fristen nach § 13 Abs. 3a SGB V schriftlich mit.
+
+Anlagen:
+${anlagen.map((x) => "- " + x).join("\n")}
+
+Mit freundlichen Grüßen
+
+
+${i.vollname || i.name || "[Dein Name]"}`;
+}
+function anredeShort(t) { return t.anrede === "frau" ? "Frau " : t.anrede === "herr" ? "Herrn " : ""; }
+function widerspruchLetter() {
+  const i = D.ich, a = D.antrag, f = antragFacts();
+  return `${i.vollname || i.name || "[Dein Name]"}
+${i.adresse || "[Deine Anschrift]"}
+
+${i.kasse || "[Name der Krankenkasse]"}
+${i.kasseAdresse || "[Anschrift der Krankenkasse]"}
+
+Berlin, ${fmtDate(isoDate())}
+
+Widerspruch gegen Ihren Bescheid vom ${a.antwortAm ? fmtDate(a.antwortAm) : "[Datum des Bescheids]"}
+Versichertennummer: ${i.versNr || "[Versichertennummer]"}${a.aktenzeichen ? "\nIhr Zeichen: " + a.aktenzeichen : ""}
+
+Sehr geehrte Damen und Herren,
+
+hiermit lege ich Widerspruch gegen Ihren Bescheid vom ${a.antwortAm ? fmtDate(a.antwortAm) : "[Datum]"} ein, mit dem Sie meinen Antrag vom ${a.gestelltAm ? fmtDate(a.gestelltAm) : "[Datum]"} auf Kostenerstattung für eine außervertragliche Psychotherapie nach § 13 Abs. 3 SGB V abgelehnt haben.
+
+Begründung:
+Die Behandlung ist notwendig${i.zeitnah ? " und laut PTV 11 zeitnah erforderlich" : ""}. Ich habe mich nachweislich bei ${plural(f.praxen, "Praxis", "Praxen")} mit Kassenzulassung um einen Therapieplatz bemüht und ${plural(f.abs, "Absage", "Absagen")}${f.wl ? ` sowie ${plural(f.wl, "Platz auf einer Warteliste", "Plätze auf Wartelisten")}${f.wMax ? " mit Wartezeiten bis zu " + f.wMax + " Wochen" : ""}` : ""} erhalten. Eine Behandlung innerhalb zumutbarer Zeit war mir als Sachleistung nicht möglich.
+
+[Hier auf die Gründe im Bescheid eingehen. Wenn die Kasse dir Praxen genannt hat: Notiere, ob und wann du dort angefragt hast und mit welchem Ergebnis.]
+
+Ich bitte Sie, Ihre Entscheidung zu überprüfen und mir einen rechtsmittelfähigen Bescheid zu erteilen. Eine ausführlichere Begründung reiche ich gegebenenfalls nach.
+
+Mit freundlichen Grüßen
+
+
+${i.vollname || i.name || "[Dein Name]"}`;
+}
+function antragView() {
+  const a = D.antrag, f = antragFacts();
+  const auto = { ptv11: D.ich.ptv11, absageliste: f.abs > 0 || f.wl > 0, privat: !!a.privatTid };
+  const privates = D.therapists.filter((t) => t.typ === "privat" || t.id === a.privatTid);
+  const done = CHECK.filter(([k]) => a.check[k] ?? auto[k]).length;
+  const frist = a.frist || (a.gestelltAm ? addDays(a.gestelltAm, 21) : "");
+  const wFrist = a.antwort === "abgelehnt" && a.antwortAm ? addMonths(a.antwortAm, 1) : "";
+  const brief = a.brief || antragLetter();
+  return `<div class="view">
+    <div class="head"><h1>Antrag Kostenerstattung</h1><p>Für den Fall, dass du trotz vieler Versuche keinen Kassenplatz findest. Nimm dir dafür Zeit, und hol dir gern Unterstützung von jemandem, dem du vertraust.</p></div>
+    <p class="note">Allgemeine Hilfe, keine Rechtsberatung. Kassen gehen unterschiedlich damit um. Ruf am besten vorher bei deiner Kasse an und frag, welche Unterlagen sie sehen möchte.</p>
+    <section class="card stack">
+      <div class="row between"><h2>Checkliste</h2><span class="pill ${done === CHECK.length ? "st-erstgespraech" : ""}">${done} von ${CHECK.length}</span></div>
+      <div class="checklist">${CHECK.map(([k, h, d]) => `<label class="check"><input type="checkbox" data-change="chk" data-k="${k}" ${(a.check[k] ?? auto[k]) ? "checked" : ""}><span><b>${esc(h)}</b>${k === "absageliste" ? ` <span class="tiny muted">(${plural(f.abs, "Absage", "Absagen")}, ${plural(f.wl, "Warteliste", "Wartelisten")})</span>` : ""}<small>${esc(d)}</small></span></label>`).join("")}</div>
+      <label class="field"><span>Privatpraxis für den Antrag</span><select data-change="privatTid"><option value="">Noch keine ausgewählt</option>${privates.map((t) => `<option value="${esc(t.id)}" ${t.id === a.privatTid ? "selected" : ""}>${esc(tName(t))}</option>`).join("")}</select><small>Hier erscheinen Einträge, die in deiner Liste als „Privatpraxis“ markiert sind.</small></label>
+    </section>
+    <section class="stack">
+      <div class="sec-title"><h2>Antragsschreiben</h2></div>
+      <p class="small muted">Vorausgefüllt aus deinen Angaben und dem Protokoll. Text in [eckigen Klammern] bitte ersetzen. Deine Änderungen werden gespeichert.</p>
+      <textarea class="letter" data-input="brief" aria-label="Antragsschreiben">${esc(brief)}</textarea>
+      <div class="row"><button class="btn" data-act="printLetter" data-which="brief">Drucken / als PDF</button><button class="btn ghost" data-act="regenLetter" data-which="brief">Neu aus Daten erzeugen</button></div>
+    </section>
+    <section class="card stack">
+      <h2>Stand des Antrags</h2>
+      <div class="grid2">
+        <label class="field"><span>Gestellt am</span><input type="date" data-change="antragF" data-k="gestelltAm" value="${esc(a.gestelltAm)}"></label>
+        <label class="field"><span>Frist der Kasse</span><input type="date" data-change="antragF" data-k="frist" value="${esc(frist)}"><small>Meist drei Wochen, wenn ein Gutachten eingeholt wird fünf Wochen (§ 13 Abs. 3a SGB V). Die Kasse muss dir Bescheid geben, wenn sie länger braucht.</small></label>
+        <label class="field"><span>Antwort</span><select data-change="antragF" data-k="antwort"><option value="">Noch offen</option><option value="genehmigt" ${a.antwort === "genehmigt" ? "selected" : ""}>Genehmigt</option><option value="teilweise" ${a.antwort === "teilweise" ? "selected" : ""}>Teilweise genehmigt</option><option value="abgelehnt" ${a.antwort === "abgelehnt" ? "selected" : ""}>Abgelehnt</option></select></label>
+        <label class="field"><span>Bescheid vom</span><input type="date" data-change="antragF" data-k="antwortAm" value="${esc(a.antwortAm)}"></label>
+        <label class="field"><span>Widerspruch eingelegt am</span><input type="date" data-change="antragF" data-k="widerspruchAm" value="${esc(a.widerspruchAm)}"></label>
+        <label class="field"><span>Aktenzeichen der Kasse</span><input type="text" data-change="antragF" data-k="aktenzeichen" value="${esc(a.aktenzeichen || "")}"></label>
+      </div>
+      ${a.gestelltAm && !a.antwort && frist ? `<div class="deadline">${daysBetween(isoDate(), frist) >= 0 ? `Die Kasse sollte bis ${fmtDate(frist)} entscheiden (noch ${plural(daysBetween(isoDate(), frist), "Tag", "Tage")}).` : `Die Frist (${fmtDate(frist)}) ist vorbei. Frag bei der Kasse nach, schriftlich ist am besten.`}</div>` : ""}
+      ${a.antwort === "genehmigt" ? `<div class="deadline" style="background:var(--sage-soft);color:var(--sage)">Genehmigt. Das hast du dir hart erarbeitet.</div>` : ""}
+      ${wFrist && !a.widerspruchAm ? `<div class="deadline">Gegen eine Ablehnung kannst du Widerspruch einlegen, in der Regel innerhalb eines Monats nach Zugang des Bescheids (etwa bis ${fmtDate(wFrist)}). Schau in die Rechtsbehelfsbelehrung im Bescheid.</div>` : ""}
+      <label class="field"><span>Notizen (z. B. Gesprächsnotizen mit der Kasse)</span><textarea data-input="antragNotiz" rows="4">${esc(a.notiz)}</textarea></label>
+    </section>
+    <details class="card flat stack" ${a.antwort === "abgelehnt" ? "open" : ""}>
+      <summary><b>Vorlage: Widerspruch</b></summary>
+      <div class="stack" style="margin-top:12px">
+        <p class="small muted">Falls der Antrag abgelehnt wird. Ein Widerspruch kostet nichts. Eine Beratungsstelle oder ein Anwalt für Sozialrecht kann dir helfen.</p>
+        <textarea class="letter" data-input="widerspruch" aria-label="Widerspruch">${esc(a.widerspruch || widerspruchLetter())}</textarea>
+        <div class="row"><button class="btn" data-act="printLetter" data-which="widerspruch">Drucken / als PDF</button><button class="btn ghost" data-act="regenLetter" data-which="widerspruch">Neu aus Daten erzeugen</button></div>
+      </div>
+    </details>
+  </div>`;
+}
+
+// ---------- Meine Angaben ----------
+function ichView() {
+  const i = D.ich;
+  const inp = (k, label, type = "text", extra = "") => `<label class="field"><span>${label}</span><input type="${type}" name="${k}" value="${esc(i[k])}" ${extra}></label>`;
+  return `<div class="view">
+    <a href="#start" class="small" style="font-weight:700">← Start</a>
+    <div class="head"><h1>Meine Angaben</h1><p>Damit füllt die App E-Mails und den Antrag für dich aus. Alles bleibt auf diesem Gerät. Fülle nur aus, was du brauchst.</p></div>
+    <form class="stack" data-form="ich">
+      <section class="card stack"><h3>Sprechstunde &amp; PTV 11</h3>
+        <div class="grid2">${inp("sprechstundeDatum", "Sprechstunde am", "date")}${inp("sprechstundeBei", "bei (Praxis)")}</div>
+        <label class="check"><input type="checkbox" name="ptv11" ${i.ptv11 ? "checked" : ""}><span><b>Ich habe das Formular PTV 11</b></span></label>
+        <label class="check"><input type="checkbox" name="zeitnah" ${i.zeitnah ? "checked" : ""}><span><b>„Zeitnah erforderlich“ ist angekreuzt</b><br><span class="small muted">Dann kann dir die 116117 mit dem Vermittlungscode helfen.</span></span></label>
+        <label class="check"><input type="checkbox" name="tss" ${i.tss ? "checked" : ""}><span><b>Ich habe es schon über die Terminservicestelle (116117) versucht</b></span></label>
+      </section>
+      <section class="card stack"><h3>Für die E-Mails</h3>
+        <label class="field"><span>Gewünschtes Verfahren</span><select name="verfahren">${Object.entries(VERFAHREN).map(([k, v]) => `<option value="${k}" ${i.verfahren === k ? "selected" : ""}>${esc(v)}</option>`).join("")}</select></label>
+        ${inp("kasse", "Krankenkasse", "text", 'placeholder="z. B. AOK Nordost"')}
+        <label class="field"><span>Zeitliche Verfügbarkeit</span><input type="text" name="verfuegbarkeit" value="${esc(i.verfuegbarkeit)}" placeholder="z. B. flexibel, am liebsten vormittags"></label>
+        <label class="field"><span>Dringlichkeit (optional, ein Satz)</span><textarea name="dringlichkeit" rows="3" placeholder="z. B. Mir geht es seit Monaten schlecht und ich merke, dass ich Unterstützung brauche.">${esc(i.dringlichkeit)}</textarea><small>Erscheint in E-Mails und im Antrag. Schreib nur, was du teilen möchtest.</small></label>
+        <div class="grid2">${inp("telefon", "Deine Telefonnummer", "tel")}${inp("email", "Deine E-Mail", "email")}</div>
+      </section>
+      <section class="card stack"><h3>Für den Antrag</h3>
+        ${inp("vollname", "Vor- und Nachname")}
+        ${inp("adresse", "Anschrift", "text", 'placeholder="Straße Nr., PLZ Berlin"')}
+        <div class="grid2">${inp("geburt", "Geburtsdatum", "date")}${inp("versNr", "Versichertennummer", "text", 'placeholder="steht auf der Karte"')}</div>
+        ${inp("kasseAdresse", "Anschrift der Krankenkasse")}
+      </section>
+      <section class="card stack"><h3>Wie dich die App anspricht</h3>${inp("name", "Vorname", "text", 'maxlength="40" required')}</section>
+      <button class="btn block" type="submit">Speichern</button>
+    </form>
+  </div>`;
+}
+
+// ---------- Daten & Sicherung ----------
+function datenView() {
+  return `<div class="view">
+    <a href="#start" class="small" style="font-weight:700">← Start</a>
+    <div class="head"><h1>Daten &amp; Sicherung</h1></div>
+    <section class="card stack">
+      <h3>Deine Daten bleiben bei dir</h3>
+      <p class="small">Alles, was du einträgst, wird nur in diesem Browser auf diesem Gerät gespeichert. Es gibt keinen Server, kein Konto, keine Werbung und kein Tracking. Die App lädt nichts aus dem Internet nach. Nur wenn du einen Link antippst, öffnet sich die Seite im Browser.</p>
+      <p class="small muted">Wenn du den Browserverlauf oder die Websitedaten löschst, sind auch die Daten weg. Mach deshalb ab und zu eine Sicherung. Die Sicherungsdatei ist nicht verschlüsselt: Bewahr sie sorgsam auf.</p>
+    </section>
+    <section class="card stack">
+      <h3>Deine Angaben</h3>
+      <p class="small">Name, Krankenkasse, Versichertennummer und Anschrift stehen unter „Meine Angaben“. Die App nutzt sie für E-Mails und den Antrag.</p>
+      <a class="btn soft" href="#ich">Meine Angaben öffnen</a>
+    </section>
+    <section class="card stack">
+      <h3>Sichern &amp; umziehen</h3>
+      <p class="small">Exportiere eine Datei als Sicherung. Mit derselben Datei kannst du die Daten auf ein anderes Gerät übertragen (dort hier „Importieren“ antippen). Ein Import ersetzt die Daten auf dem Gerät.</p>
+      <div class="row"><button class="btn" data-act="exportOne">Sicherung exportieren</button></div>
+      <label class="btn soft" style="cursor:pointer">Importieren …<input type="file" accept="application/json,.json" data-change="import" hidden></label>
+    </section>
+    <section class="card stack">
+      <h3>Löschen</h3>
+      <p class="small">Löscht deine Angaben, alle Praxen, Protokolle und Vorlagen auf diesem Gerät, endgültig. Exportiere vorher eine Sicherung, wenn du die Daten behalten willst.</p>
+      <button class="btn danger" data-act="wipe">Alle Daten löschen</button>
+    </section>
+    <p class="tiny muted">Therapieplatz · Version 1 · Schriften: Fraunces und Nunito (SIL Open Font License), lokal eingebunden.</p>
+  </div>`;
+}
+
+// ---------- Sheets ----------
+function openSheet(html, onMount) {
+  closeSheet();
+  const s = document.createElement("div");
+  s.className = "scrim";
+  s.innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+  s.addEventListener("click", (e) => { if (e.target === s) closeSheet(); });
+  document.body.appendChild(s);
+  document.body.style.overflow = "hidden";
+  onMount && onMount(s);
+  const f = s.querySelector("[autofocus]");
+  if (f && matchMedia("(min-width: 700px)").matches) f.focus();
+}
+function closeSheet() { $$(".scrim").forEach((x) => x.remove()); document.body.style.overflow = ""; }
+addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
+
+function tForm(t, note) {
+  t = normT(t || {});
+  const zrow = (z) => `<div class="zrow"><select name="ztag" aria-label="Tag">${[1, 2, 3, 4, 5, 6, 7].map((d) => `<option value="${d}" ${+z.tag === d ? "selected" : ""}>${TAGE[d]}</option>`).join("")}</select><input type="time" name="zvon" value="${esc(z.von)}" aria-label="von"><input type="time" name="zbis" value="${esc(z.bis)}" aria-label="bis"><button type="button" data-act="zDel" aria-label="Zeile entfernen">✕</button></div>`;
+  openSheet(`<form class="stack" data-form="t" data-id="${esc(t.id)}">
+    <h2>${D.therapists.some((x) => x.id === t.id) ? "Eintrag bearbeiten" : "Neue Praxis"}</h2>
+    ${note ? `<p class="small" style="background:var(--honey-soft);color:var(--honey);padding:8px 12px;border-radius:12px">${esc(note)}</p>` : ""}
+    <div class="grid2">
+      <label class="field"><span>Name</span><input type="text" name="name" value="${esc(t.name)}" autofocus placeholder="z. B. Dr. Anna Beispiel"></label>
+      <label class="field"><span>Anrede (für E-Mails)</span><select name="anrede"><option value="">neutral</option><option value="frau" ${t.anrede === "frau" ? "selected" : ""}>Frau</option><option value="herr" ${t.anrede === "herr" ? "selected" : ""}>Herr</option></select></label>
+    </div>
+    <label class="field"><span>Praxis</span><input type="text" name="praxis" value="${esc(t.praxis)}"></label>
+    <label class="field"><span>Adresse</span><input type="text" name="adresse" value="${esc(t.adresse)}"></label>
+    <div class="grid2">
+      <label class="field"><span>Bezirk</span><select name="bezirk"><option value="">–</option>${BEZIRKE.map((b) => `<option ${t.bezirk === b ? "selected" : ""}>${esc(b)}</option>`).join("")}</select></label>
+      <label class="field"><span>Abrechnung</span><select name="typ"><option value="">Unklar</option><option value="kasse" ${t.typ === "kasse" ? "selected" : ""}>Kassensitz</option><option value="privat" ${t.typ === "privat" ? "selected" : ""}>Privatpraxis</option></select></label>
+    </div>
+    <fieldset class="field" style="border:0;padding:0;margin:0"><span>Verfahren</span><div class="row">${Object.entries(VERFAHREN).map(([k, v]) => `<label class="check small"><input type="checkbox" name="verfahren" value="${k}" ${t.verfahren.includes(k) ? "checked" : ""}><span>${esc(v)}</span></label>`).join("")}</div></fieldset>
+    <div class="grid2">
+      <label class="field"><span>Telefon</span><input type="tel" name="telefon" value="${esc(t.telefon)}"></label>
+      <label class="field"><span>E-Mail</span><input type="email" name="email" value="${esc(t.email)}"></label>
+    </div>
+    <div class="field"><span>Telefonsprechzeiten</span><div class="zeiten" id="zeiten">${t.zeiten.map(zrow).join("")}</div><button type="button" class="btn small ghost" data-act="zAdd" style="align-self:flex-start">+ Zeitfenster</button></div>
+    <label class="field"><span>Website</span><input type="text" name="website" value="${esc(t.website)}" inputmode="url"></label>
+    <label class="field"><span>Notizen</span><textarea name="notizen" rows="3">${esc(t.notizen)}</textarea></label>
+    <input type="hidden" name="status" value="${esc(t.status)}"><input type="hidden" name="warteWochen" value="${esc(t.warteWochen)}">
+    <div class="acts"><button type="button" class="btn ghost" data-act="close">Abbrechen</button><button class="btn" type="submit">Speichern</button></div>
+  </form>`, (s) => { s._zrow = zrow; });
+}
+function pasteSheet() {
+  openSheet(`<div class="stack">
+    <h2>Aus Text einfügen</h2>
+    <p class="small muted">Kopier einen Eintrag von einer Suchseite (z. B. KV Berlin oder therapie.de) und füg ihn hier ein. Die App versucht, Name, Telefon, E-Mail, Adresse und Telefonzeiten zu erkennen. Danach kannst du alles prüfen.</p>
+    <textarea id="pasteText" rows="10" autofocus placeholder="Hier einfügen …"></textarea>
+    <div class="acts"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" data-act="parse">Erkennen</button></div>
+  </div>`);
+}
+function callSheet(tid) {
+  const t = T(tid);
+  if (!t) return;
+  let pick = "";
+  openSheet(`<div class="stack" data-callsheet="${esc(tid)}">
+    <h2>Wie lief der Anruf?</h2>
+    <p class="muted">${esc(tName(t))} · ${fmtTime(new Date().toISOString())} Uhr</p>
+    <div class="outcomes">${CALL_RES.map((k) => `<button type="button" data-out="${k}">${esc(RES[k].label)}</button>`).join("")}</div>
+    <label class="field" id="wwrap" hidden><span>Wie viele Wochen Wartezeit ungefähr?</span><input type="number" id="wochen" min="0" max="200" inputmode="numeric" placeholder="z. B. 26"></label>
+    <label class="field"><span>Notiz (optional)</span><textarea id="callNote" rows="2" placeholder="z. B. „Nächste Woche nochmal versuchen“"></textarea></label>
+    <div class="acts"><button class="btn ghost" data-act="close">Schließen</button><button class="btn" id="callSave" disabled>Eintragen</button></div>
+  </div>`, (s) => {
+    s.querySelectorAll("[data-out]").forEach((b) => b.addEventListener("click", () => {
+      pick = b.dataset.out;
+      s.querySelectorAll("[data-out]").forEach((x) => x.classList.toggle("on", x === b));
+      s.querySelector("#wwrap").hidden = pick !== "warteliste";
+      s.querySelector("#callSave").disabled = false;
+    }));
+    s.querySelector("#callSave").addEventListener("click", () => {
+      if (!pick) return;
+      addLog({ tid, kanal: "telefon", ergebnis: pick, wochen: s.querySelector("#wochen").value.trim(), text: s.querySelector("#callNote").value.trim() });
+      try { localStorage.removeItem(LS + ".pending"); } catch {}
+      closeSheet();
+      render();
+      toast(gentle(pick));
+    });
+  });
+}
+function gentle(k) {
+  return ({
+    nicht_erreicht: "Notiert. Nicht erreicht zu werden ist leider normal. Beim nächsten Zeitfenster klappt es vielleicht.",
+    ab: "Notiert. Gut, dass du draufgesprochen hast.",
+    besetzt: "Notiert. Besetzt heißt oft: einfach in ein paar Minuten nochmal.",
+    absage: "Absage notiert. Das ist hart, aber es zählt: Jede Absage hilft dir beim Antrag.",
+    warteliste: "Warteliste notiert. Ein Platz in Sicht ist ein Anfang.",
+    rueckruf: "Rückruf notiert. Halt dein Handy in der Nähe.",
+    termin: "Ein Termin! Wie schön. Notiert.",
+    gesendet: "Als gesendet notiert.",
+  })[k] || "Gespeichert.";
+}
+function logSheet(opts) {
+  const l = opts.log || {};
+  const ts = l.ts ? new Date(l.ts) : new Date();
+  const tid = l.tid || opts.tid || "";
+  const res = l.ergebnis || opts.ergebnis || (opts.reply ? "antwort" : "nicht_erreicht");
+  const kanal = l.kanal || opts.kanal || (opts.reply ? "email" : "telefon");
+  openSheet(`<form class="stack" data-form="log" data-id="${esc(l.id || "")}">
+    <h2>${l.id ? "Eintrag ändern" : opts.reply ? "Antwort oder Notiz eintragen" : "Kontakt nachtragen"}</h2>
+    <label class="field"><span>Therapeut:in</span><select name="tid" required>${D.therapists.map((t) => `<option value="${esc(t.id)}" ${t.id === tid ? "selected" : ""}>${esc(tName(t))}</option>`).join("")}</select></label>
+    <div class="grid2">
+      <label class="field"><span>Datum</span><input type="date" name="datum" value="${isoDate(ts)}" required></label>
+      <label class="field"><span>Uhrzeit</span><input type="time" name="zeit" value="${pad(ts.getHours())}:${pad(ts.getMinutes())}" required></label>
+      <label class="field"><span>Kanal</span><select name="kanal">${Object.entries(KANAL).map(([k, v]) => `<option value="${k}" ${k === kanal ? "selected" : ""}>${v}</option>`).join("")}</select></label>
+      <label class="field"><span>Ergebnis</span><select name="ergebnis">${Object.entries(RES).map(([k, v]) => `<option value="${k}" ${k === res ? "selected" : ""}>${esc(v.label)}</option>`).join("")}</select></label>
+    </div>
+    <label class="field"><span>Wartezeit in Wochen (bei Warteliste)</span><input type="number" name="wochen" min="0" max="200" value="${esc(l.wochen || "")}"></label>
+    <label class="field"><span>${opts.reply ? "Antworttext (einfach einfügen) oder Notiz" : "Notiz"}</span><textarea name="text" rows="${opts.reply ? 7 : 3}">${esc(l.text || "")}</textarea></label>
+    ${!l.id ? `<label class="check small"><input type="checkbox" name="apply" checked><span>Status der Praxis danach anpassen</span></label>` : ""}
+    <div class="acts">${l.id ? `<button type="button" class="btn danger" data-act="delLog" data-id="${esc(l.id)}">Löschen</button>` : `<button type="button" class="btn ghost" data-act="close">Abbrechen</button>`}<button class="btn" type="submit">Speichern</button></div>
+  </form>`);
+}
+function confirmSheet(title, text, okLabel, onOk) {
+  openSheet(`<div class="stack"><h2>${esc(title)}</h2><p>${esc(text)}</p><div class="acts"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" style="background:var(--rose)" id="okBtn">${esc(okLabel)}</button></div></div>`, (s) => {
+    s.querySelector("#okBtn").addEventListener("click", () => { closeSheet(); onOk(); });
+  });
+}
+let toastTimer;
+function toast(msg) {
+  $$(".toast").forEach((x) => x.remove());
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.setAttribute("role", "status");
+  t.textContent = msg;
+  document.body.appendChild(t);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.remove(), 4200);
+}
+
+// ---------- Export / Import ----------
+function buildExport() {
+  save();
+  return { app: "therapieplatz", format: 2, exportiert: new Date().toISOString(), daten: D };
+}
+function download(obj, name) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+function importData(text) {
+  let obj;
+  try { obj = JSON.parse(text); } catch { toast("Die Datei konnte nicht gelesen werden."); return; }
+  if (!obj || obj.app !== "therapieplatz" || !obj.daten || typeof obj.daten !== "object") { toast("Das ist keine Sicherung aus dieser App."); return; }
+  const go = () => {
+    D = normalize(obj.daten);
+    save();
+    location.hash = "#start";
+    render();
+    toast("Sicherung importiert.");
+  };
+  const hasData = D && (D.therapists.length || D.log.length || D.ich.kasse);
+  if (hasData) confirmSheet("Daten ersetzen?", "Auf diesem Gerät sind schon Daten. Beim Import werden sie durch die aus der Datei ersetzt.", "Ersetzen", go);
+  else go();
+}
+
+// ---------- Ereignisse ----------
+const ACT = {
+  close: () => closeSheet(),
+  wipe: () => confirmSheet("Wirklich alles löschen?", "Deine Angaben, alle Praxen, Protokolle und Vorlagen werden von diesem Gerät gelöscht. Das lässt sich nicht rückgängig machen.", "Ja, alles löschen", () => {
+    try { Object.keys(localStorage).filter((k) => k.startsWith(LS + ".")).forEach((k) => localStorage.removeItem(k)); } catch {}
+    D = null; location.hash = ""; render();
+  }),
+  exportOne: () => download(buildExport(), `therapieplatz-sicherung-${isoDate()}.json`),
+  setWeg: (el) => { D.ich.weg = el.dataset.weg; save(); render(); },
+  addT: () => tForm(null),
+  paste: () => pasteSheet(),
+  parse: () => { const r = parseText($("#pasteText").value); tForm(r, "Bitte prüf die erkannten Angaben. Die Erkennung ist nur eine Hilfe."); },
+  editT: (el) => tForm(T(el.dataset.id)),
+  open: (el) => { location.hash = "#t/" + el.dataset.id; },
+  zAdd: () => { const s = $(".scrim"); const box = $("#zeiten"); box.insertAdjacentHTML("beforeend", s._zrow({ tag: Math.min(wd(new Date()), 5), von: "09:00", bis: "10:00" })); },
+  zDel: (el) => el.closest(".zrow").remove(),
+  delT: (el) => { const t = T(el.dataset.id); confirmSheet("Eintrag löschen?", `„${tName(t)}“ wird aus der Liste entfernt. Die Einträge im Protokoll bleiben erhalten (für deinen Nachweis).`, "Löschen", () => { D.therapists = D.therapists.filter((x) => x.id !== t.id); save(); location.hash = "#liste"; toast("Gelöscht."); }); },
+  setStatus: (el) => { const t = T(el.dataset.id); t.status = el.dataset.s; save(); render(); },
+  call: (el) => {
+    // Der tel:-Link öffnet die Telefon-App, das Ergebnis-Blatt wartet bei der Rückkehr
+    try { localStorage.setItem(LS + ".pending", JSON.stringify({ tid: el.dataset.id, at: Date.now() })); } catch {}
+    setTimeout(() => callSheet(el.dataset.id), 250);
+    return "default";
+  },
+  mailOne: (el) => { ui.mailTab = "sammel"; D.queue = null; ui.pick = new Set([el.dataset.id]); location.hash = "#mails"; },
+  logReply: (el) => logSheet({ tid: el.dataset.id, reply: true }),
+  addLog: () => D.therapists.length ? logSheet({}) : toast("Leg zuerst eine Praxis in der Liste an."),
+  editLog: (el) => { const l = D.log.find((x) => x.id === el.dataset.id); if (l) logSheet({ log: l }); },
+  delLog: (el) => { D.log = D.log.filter((x) => x.id !== el.dataset.id); save(); closeSheet(); render(); toast("Eintrag gelöscht."); },
+  fStatus: (el) => { ui.filter.status = el.dataset.v; render(); },
+  mailTab: (el) => { ui.mailTab = el.dataset.tab; if (location.hash !== "#mails") { location.hash = "#mails"; return "default"; } render(); },
+  pickAll: () => { ui.pick = new Set(D.therapists.filter((t) => t.email && activeT(t)).map((t) => t.id)); render(); },
+  pickNone: () => { ui.pick = new Set(); render(); },
+  queueStart: () => {
+    const ids = D.therapists.filter((t) => t.email && activeT(t) && ui.pick.has(t.id)).map((t) => t.id);
+    if (!ids.length) return;
+    D.queue = { tpl: ui.tplId || D.templates[0].id, items: ids, idx: 0, sent: 0 };
+    save(); render();
+  },
+  queueSend: () => {
+    const q = D.queue; const t = T(q.items[q.idx]); const tpl = D.templates.find((x) => x.id === q.tpl) || D.templates[0];
+    addLog({ tid: t.id, kanal: "email", ergebnis: "gesendet", text: "Betreff: " + fill(tpl.subject, t) + " (Vorlage: " + tpl.name + ")" });
+    q.idx++; q.sent = (q.sent || 0) + 1; save();
+    setTimeout(render, 400);
+    return "default";
+  },
+  queueSkip: () => { D.queue.idx++; save(); render(); },
+  queueStop: () => { D.queue = null; ui.pick = null; save(); render(); },
+  followSend: (el) => { const t = T(el.dataset.id); D.followDone[el.dataset.log] = true; addLog({ tid: t.id, kanal: "email", ergebnis: "gesendet", text: "Nachgefasst" }); setTimeout(render, 400); return "default"; },
+  followDone: (el) => { D.followDone[el.dataset.log] = true; save(); render(); },
+  editTpl: (el) => { ui.editTpl = el.dataset.id; render(); },
+  newTpl: () => { const t = { id: "t" + uid(), name: "Neue Vorlage", subject: "Anfrage Therapieplatz", body: "{anrede},\n\n\n\nViele Grüße\n{meinName}" }; D.templates.push(t); ui.editTpl = t.id; save(); render(); },
+  delTpl: (el) => { if (D.templates.length <= 1) { toast("Mindestens eine Vorlage muss bleiben."); return; } D.templates = D.templates.filter((x) => x.id !== el.dataset.id); ui.editTpl = null; save(); render(); },
+  resetTpl: () => confirmSheet("Standardvorlagen wiederherstellen?", "Die drei mitgelieferten Vorlagen werden zurückgesetzt. Eigene neue Vorlagen bleiben erhalten.", "Wiederherstellen", () => { const def = DEFAULT_TEMPLATES(); D.templates = def.concat(D.templates.filter((t) => !def.some((d) => d.id === t.id))); save(); render(); }),
+  insPh: (el) => { const ta = $("#tplBody"); const s = ta.selectionStart ?? ta.value.length; const ins = "{" + el.dataset.k + "}"; ta.value = ta.value.slice(0, s) + ins + ta.value.slice(ta.selectionEnd ?? s); ta.focus(); ta.selectionStart = ta.selectionEnd = s + ins.length; },
+  printLog: () => printLog(),
+  printLetter: (el) => { const k = el.dataset.which; const txt = D.antrag[k] || (k === "brief" ? antragLetter() : widerspruchLetter()); doPrint(`<div class="letter-print">${esc(txt)}</div>`); },
+  regenLetter: (el) => { const k = el.dataset.which; const go = () => { D.antrag[k] = ""; save(); render(); toast("Neu erzeugt."); }; D.antrag[k] ? confirmSheet("Neu erzeugen?", "Deine Änderungen am Text gehen dabei verloren.", "Neu erzeugen", go) : go(); },
+};
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const fn = ACT[el.dataset.act];
+  if (!fn) return;
+  const r = fn(el, e);
+  if (r !== "default" && el.tagName === "A") e.preventDefault();
+});
+const CHANGE = {
+  fBezirk: (el) => { ui.filter.bezirk = el.value; render(); },
+  fVerfahren: (el) => { ui.filter.verfahren = el.value; render(); },
+  fTyp: (el) => { ui.filter.typ = el.value; render(); },
+  warte: (el) => { T(el.dataset.id).warteWochen = el.value; save(); },
+  tplPick: (el) => { ui.tplId = el.value; render(); },
+  pick: (el) => { el.checked ? ui.pick.add(el.value) : ui.pick.delete(el.value); render(); },
+  printNeg: (el) => { ui.printOnlyNeg = el.checked; },
+  logFilter: (el) => { ui.logFilter = el.value; render(); },
+  chk: (el) => { D.antrag.check[el.dataset.k] = el.checked; save(); render(); },
+  privatTid: (el) => { D.antrag.privatTid = el.value; if (!D.antrag.brief) {} save(); render(); },
+  antragF: (el) => { D.antrag[el.dataset.k] = el.value; save(); render(); },
+  import: (el) => { const f = el.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => importData(String(r.result)); r.readAsText(f); el.value = ""; },
+};
+document.addEventListener("change", (e) => { const el = e.target.closest("[data-change]"); if (el && CHANGE[el.dataset.change]) CHANGE[el.dataset.change](el); });
+const INPUT = {
+  fQ: (el) => { ui.filter.q = el.value; const box = $(".tlist"); if (box) box.innerHTML = filteredTherapists().map(tCard).join("") || `<div class="empty">Keine Treffer.</div>`; },
+  brief: (el) => { D.antrag.brief = el.value; save(); },
+  widerspruch: (el) => { D.antrag.widerspruch = el.value; save(); },
+  antragNotiz: (el) => { D.antrag.notiz = el.value; save(); },
+};
+document.addEventListener("input", (e) => { const el = e.target.closest("[data-input]"); if (el && INPUT[el.dataset.input]) INPUT[el.dataset.input](el); });
+
+const FORM = {
+  welcome: (fd) => { const n = String(fd.get("name") || "").trim().slice(0, 40); if (!n) return; D = blankData(n); save(); location.hash = "#start"; render(); },
+  t: (fd, form) => {
+    const id = form.dataset.id;
+    const tage = fd.getAll("ztag"), von = fd.getAll("zvon"), bis = fd.getAll("zbis");
+    const zeiten = tage.map((tg, n) => ({ tag: +tg, von: von[n], bis: bis[n] })).filter((z) => toMin(z.von) != null && toMin(z.bis) > toMin(z.von));
+    const data = { name: "", anrede: "", praxis: "", adresse: "", bezirk: "", typ: "", telefon: "", email: "", website: "", notizen: "" };
+    for (const k of Object.keys(data)) data[k] = String(fd.get(k) || "").trim();
+    if (!data.name && !data.praxis) { toast("Bitte gib mindestens einen Namen oder eine Praxis an."); return; }
+    data.verfahren = fd.getAll("verfahren");
+    data.zeiten = zeiten;
+    const ex = T(id);
+    if (ex) Object.assign(ex, data);
+    else D.therapists.push(normT(Object.assign({ id, status: "neu", created: new Date().toISOString() }, data)));
+    save(); closeSheet();
+    if (!ex) { ui.pick = null; location.hash = "#t/" + id; }
+    render();
+    toast(ex ? "Gespeichert." : "Hinzugefügt.");
+  },
+  log: (fd, form) => {
+    const id = form.dataset.id;
+    const d = new Date(fd.get("datum") + "T" + (fd.get("zeit") || "12:00"));
+    const entry = { tid: String(fd.get("tid")), ts: isNaN(d) ? new Date().toISOString() : d.toISOString(), kanal: String(fd.get("kanal")), ergebnis: String(fd.get("ergebnis")), wochen: String(fd.get("wochen") || "").trim(), text: String(fd.get("text") || "").trim() };
+    if (id) { const l = D.log.find((x) => x.id === id); Object.assign(l, entry, { tname: tName(T(entry.tid)) }); save(); }
+    else addLog(entry, { applyStatus: fd.get("apply") === "on" });
+    closeSheet(); render(); toast("Gespeichert.");
+  },
+  tpl: (fd, form) => { const t = D.templates.find((x) => x.id === form.dataset.id); t.name = String(fd.get("name")).trim() || "Vorlage"; t.subject = String(fd.get("subject")); t.body = String(fd.get("body")); save(); render(); toast("Vorlage gespeichert."); },
+  ich: (fd) => {
+    const i = D.ich;
+    for (const k of ["sprechstundeDatum", "sprechstundeBei", "verfahren", "kasse", "verfuegbarkeit", "dringlichkeit", "telefon", "email", "vollname", "adresse", "geburt", "versNr", "kasseAdresse"]) i[k] = String(fd.get(k) || "").trim();
+    for (const k of ["ptv11", "zeitnah", "tss"]) i[k] = fd.get(k) === "on";
+    const n = String(fd.get("name") || "").trim().slice(0, 40);
+    if (n) i.name = n;
+    save(); location.hash = "#start"; toast("Gespeichert.");
+  },
+};
+document.addEventListener("submit", (e) => {
+  const form = e.target.closest("[data-form]");
+  if (!form) return;
+  e.preventDefault();
+  FORM[form.dataset.form]?.(new FormData(form), form);
+});
+
+addEventListener("hashchange", () => { parseRoute(); closeSheet(); render(); scrollTo(0, 0); });
+addEventListener("storage", (e) => { if (e.key === KEY && !$(".scrim")) { loadAll(); render(); } });
+// Rückkehr aus der Telefon-App: offenes Ergebnis-Blatt wieder zeigen
+function resumePending() {
+  const p = lsGet(LS + ".pending");
+  if (!p || !D || Date.now() - p.at > 3 * 3600 * 1000) return;
+  if (!$(".scrim") && T(p.tid)) callSheet(p.tid);
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { resumePending(); tickCountdowns(); } });
+setInterval(tickCountdowns, 20000);
+
+// ---------- Start ----------
+loadAll();
+parseRoute();
+render();
+resumePending();
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
+</body>
+</html>
